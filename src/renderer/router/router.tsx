@@ -1,16 +1,14 @@
 import { createHashRouter } from 'react-router-dom';
-import HomePage from '../pages/homePage';
-import Detail from '../pages/homePage/Detail.tsx';
+import routes from './routes.tsx';
 
-const router = createHashRouter([
-  {
-    path: '/',
-    element: <HomePage />,
+const router = createHashRouter(routes, {
+  future: {
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_relativeSplatPath: true,
+    v7_skipActionErrorRevalidation: true,
   },
-  {
-    path: '/detail',
-    element: <Detail />,
-  },
-]);
+});
 
 export { router };
