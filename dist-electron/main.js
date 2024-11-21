@@ -1,6 +1,14 @@
-import { app, BrowserWindow } from "electron";
+import { BrowserWindow, app, ipcMain } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+var IpcKey = /* @__PURE__ */ ((IpcKey2) => {
+  IpcKey2["close"] = "close";
+  return IpcKey2;
+})(IpcKey || {});
+const windowClose = (event) => {
+  const win2 = BrowserWindow.fromWebContents(event.sender);
+  if (win2) win2.close();
+};
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -27,6 +35,13 @@ function createWindow() {
   });
   VITE_DEV_SERVER_URL ? win.loadURL(VITE_DEV_SERVER_URL) : win.loadFile(path.join(RENDERER_DIST, "index.html"));
   app.isPackaged || win.webContents.openDevTools();
+  const ipcMainMap = /* @__PURE__ */ new Map([
+    [IpcKey.close, windowClose]
+  ]);
+  ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
+  win.on("closed", () => {
+    ipcMainMap.forEach((_value, key) => ipcMain.removeAllListeners(key));
+  });
 }
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

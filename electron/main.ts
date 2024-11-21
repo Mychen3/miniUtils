@@ -1,6 +1,8 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { IpcKey } from './ipc/ipcKey.ts';
+import { windowClose } from './ipc/mainIpc.ts';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, '..');
@@ -30,6 +32,15 @@ function createWindow() {
   });
   VITE_DEV_SERVER_URL ? win.loadURL(VITE_DEV_SERVER_URL) : win.loadFile(path.join(RENDERER_DIST, 'index.html'));
   app.isPackaged || win.webContents.openDevTools();
+
+  const ipcMainMap = new Map<IpcKey, (event: IpcMainEvent, ...args: Parameters<any>) => void>([
+    [IpcKey.close, windowClose],
+  ]);
+  ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
+
+  win.on('closed', () => {
+    ipcMainMap.forEach((_value, key) => ipcMain.removeAllListeners(key));
+  });
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common

@@ -1,0 +1,9 @@
+:root {
+  --head-height: 60px;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+
+}

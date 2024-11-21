@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@pages': join(__dirname, 'src/renderer/pages'),
+      '@hooks': join(__dirname, 'src/renderer/hooks'),
     },
   },
   css: {
