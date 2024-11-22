@@ -9,7 +9,8 @@
     "paths": {
       "@pages/*": ["src/renderer/pages/*"],
       "@hooks/*": ["src/renderer/hooks/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@const/*": ["src/common/constants/*"]
     },
 
     /* Bundler mode */

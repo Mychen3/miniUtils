@@ -11,6 +11,7 @@ export default defineConfig({
       '@pages': join(__dirname, 'src/renderer/pages'),
       '@hooks': join(__dirname, 'src/renderer/hooks'),
       '@utils': join(__dirname, 'src/utils'),
+      '@const': join(__dirname, 'src/common/constants'),
     },
   },
   css: {

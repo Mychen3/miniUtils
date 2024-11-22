@@ -1,19 +1,25 @@
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@nextui-org/react';
+import { Switch } from '@nextui-org/react';
 import styles from './css/index.module.scss';
+import useTheme from '@hooks/useTheme.ts';
+import { Theme } from '@const/publicConst.ts';
+import { ChangeEvent, useMemo } from 'react';
 
 const HomePage = () => {
-  const navigate = useNavigate();
+  const [theme, setTheme] = useTheme('app-content');
 
-  const onClickToDetail = () => {
-    navigate('/detail');
+  const selectedChecked = useMemo(() => theme === Theme.dark, [theme]);
+
+  const onClickChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked;
+    setTheme(checked ? Theme.dark : Theme.light);
   };
+
   return (
     <div className={styles.container}>
       <div className="box-border"></div>
-      <Button color="primary" onClick={onClickToDetail}>
-        跳转到详情
-      </Button>
+      <Switch isSelected={selectedChecked} color="primary" onChange={onClickChange}>
+        开关
+      </Switch>
     </div>
   );
 };
