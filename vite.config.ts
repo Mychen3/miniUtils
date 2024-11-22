@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       '@pages': join(__dirname, 'src/renderer/pages'),
       '@hooks': join(__dirname, 'src/renderer/hooks'),
+      '@utils': join(__dirname, 'src/utils'),
     },
   },
   css: {

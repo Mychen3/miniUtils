@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { IpcKey } from './ipc/ipcKey.ts';
 import { windowClose } from './ipc/mainIpc.ts';
+import { systemKey } from '../common/const/index.ts';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, '..');
@@ -14,9 +16,11 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 
 let win: BrowserWindow | null;
 function createWindow() {
+  const isMac = process.platform === systemKey.mac;
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'logo.png'),
-    frame: false,
+    frame: isMac,
+    titleBarStyle: isMac ? 'hidden' : 'default',
     height: 860,
     width: 1440,
     minHeight: 860,

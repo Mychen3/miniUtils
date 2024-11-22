@@ -1,14 +1,22 @@
+import Layout from '@pages/layout';
 import HomePage from '../pages/homePage';
-import Detail from '../pages/homePage/Detail.tsx';
 
 const routes = [
   {
     path: '/',
-    element: <HomePage />,
-  },
-  {
-    path: '/detail',
-    element: <Detail />,
+    element: <Layout />,
+    meta: {
+      title: '布局栏',
+    },
+    children: [
+      {
+        path: '',
+        element: <HomePage />,
+        meta: {
+          title: '首页',
+        },
+      },
+    ],
   },
 ];
 

@@ -6,6 +6,12 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
+    "paths": {
+      "@pages/*": ["src/renderer/pages/*"],
+      "@hooks/*": ["src/renderer/hooks/*"],
+      "@utils/*": ["src/utils/*"]
+    },
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
