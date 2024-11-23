@@ -4,7 +4,7 @@ import { IpcKey } from '../ipc/ipcKey.ts';
 const electronAPI = {
   windowClose: () => ipcRenderer.send(IpcKey.close),
   windowHide: () => ipcRenderer.send(IpcKey.windowHide),
-  windowMMinimize: () => ipcRenderer.send(IpcKey.windowMinimize),
+  windowMinimize: () => ipcRenderer.send(IpcKey.windowMinimize),
   changeWindowSize: (isMax: boolean) => ipcRenderer.send(IpcKey.changeWindowSize, isMax),
   setWinPin: (isPin: boolean) => ipcRenderer.send(IpcKey.setWindowPin, isPin),
 };
