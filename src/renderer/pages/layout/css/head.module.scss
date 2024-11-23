@@ -3,14 +3,15 @@
   height: var(--head-height);
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .iconsBox {
   display: grid;
   grid-template-columns: repeat(4, 35px);
   box-sizing: border-box;
+  height: 100%;
+  flex: 0 0 auto;
 
   & > div {
     height: 100%;
@@ -18,8 +19,52 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    &:hover{
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+
+    &:hover {
       cursor: pointer;
     }
+
+    svg {
+      transition: color 0.3s ease;
+      color: hsl(var(--theme-default-600));
+    }
   }
+
+  .closeBox {
+    &:hover {
+      background-color: #ff4d4f;
+
+      svg {
+        color: #ffffff;
+      }
+    }
+  }
+
+  .scale {
+    &:hover {
+      background-color: hsl(var(--theme-primary-100));
+    }
+  }
+
+  .onTop {
+    svg {
+      color: hsl(var(--theme-primary-500))
+    }
+  }
+}
+
+.drag {
+  box-sizing: border-box;
+  width: calc(100vw - 140px);
+  height: 100%;
+  flex: 1;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.macDrag{
+  width: calc(100vw - 52px);
+  flex: 0 0 auto;
 }

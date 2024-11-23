@@ -8,6 +8,7 @@ export default {
   darkMode: 'class',
   plugins: [
     nextui({
+      prefix: 'theme',
       themes: {
         light: {
           colors: {

@@ -3,4 +3,10 @@ enum Theme {
   dark = 'dark',
 }
 
-export { Theme };
+enum systemKey {
+  win = 'Macintosh',
+  mac = 'Windows',
+  linux = 'Linux',
+}
+
+export { Theme, systemKey };

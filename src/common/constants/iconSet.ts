@@ -4,6 +4,7 @@ const IconSet = {
   windowRestore: lazy(() => import('~icons/mdi/window-restore')),
   windowMinimize: lazy(() => import('~icons/mdi/window-minimize')),
   windowMaximize: lazy(() => import('~icons/mdi/window-maximize')),
+  windowPin: lazy(() => import('~icons/mdi/pin-outline')),
 };
 
 type IconSetType = keyof typeof IconSet;
