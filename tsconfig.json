@@ -5,8 +5,10 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-
+    "types":["unplugin-icons/types/react"],
+    "baseUrl": "./",
     "paths": {
+      "@src/*": ["src/*"],
       "@pages/*": ["src/renderer/pages/*"],
       "@hooks/*": ["src/renderer/hooks/*"],
       "@utils/*": ["src/utils/*"],

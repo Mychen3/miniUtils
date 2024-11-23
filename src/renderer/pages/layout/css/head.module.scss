@@ -1,8 +1,25 @@
-.container{
+.container {
   box-sizing: border-box;
   height: var(--head-height);
   display: flex;
   align-items: center;
   padding: 0 12px;
+  justify-content: flex-end;
+}
 
+.iconsBox {
+  display: grid;
+  grid-template-columns: repeat(4, 35px);
+  box-sizing: border-box;
+
+  & > div {
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover{
+      cursor: pointer;
+    }
+  }
 }

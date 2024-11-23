@@ -4,7 +4,6 @@ import path from 'node:path';
 import { IpcKey } from './ipc/ipcKey.ts';
 import { windowClose } from './ipc/mainIpc.ts';
 import { systemKey } from '../common/const/index.ts';
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, '..');
@@ -65,4 +64,6 @@ app.on('activate', () => {
   }
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+});

@@ -21,6 +21,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
+    "@iconify-json/mdi": "^1.2.1",
+    "@svgr/core": "^8.1.0",
+    "@svgr/plugin-jsx": "^8.1.0",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^8.14.0",
@@ -40,6 +43,7 @@
     "sass-embedded": "^1.81.0",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.3",
+    "unplugin-icons": "^0.20.1",
     "vite": "^5.4.11",
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-electron-renderer": "^0.14.6"

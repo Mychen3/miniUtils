@@ -3,11 +3,12 @@ import path from 'node:path';
 import electron from 'vite-plugin-electron/simple';
 import react from '@vitejs/plugin-react';
 import { join } from 'path';
-
-// https://vitejs.dev/config/
+import Icons from 'unplugin-icons/vite';
+import { FileSystemIconLoader } from 'unplugin-icons/loaders';
 export default defineConfig({
   resolve: {
     alias: {
+      '@src': join(__dirname, 'src/'),
       '@pages': join(__dirname, 'src/renderer/pages'),
       '@hooks': join(__dirname, 'src/renderer/hooks'),
       '@utils': join(__dirname, 'src/utils'),
@@ -34,6 +35,13 @@ export default defineConfig({
         input: path.join(__dirname, 'electron/preload/preload.ts'),
       },
       renderer: process.env.NODE_ENV === 'test' ? undefined : {},
+    }),
+    Icons({
+      customCollections: {
+        mySvg: FileSystemIconLoader('src/assets/svg'),
+      },
+      compiler: 'jsx',
+      jsx: 'react',
     }),
   ],
 });
