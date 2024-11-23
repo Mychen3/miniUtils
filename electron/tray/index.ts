@@ -29,7 +29,7 @@ let tray: Tray | null = null;
 
 export const createTray = (iconPath: string) => {
   if (tray) return;
-  const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 32, height: 32 });
+  const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 24, height: 24 });
   tray = new Tray(trayIcon);
   tray.setImage(trayIcon);
   tray.setContextMenu(menuTray);
