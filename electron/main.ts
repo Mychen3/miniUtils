@@ -30,8 +30,11 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.mjs'),
       contextIsolation: true, // 启用上下文隔离
     },
+    show: false,
   });
-
+  win.on('ready-to-show', () => {
+    win?.show(); // 初始化后再显示
+  });
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString());
   });
