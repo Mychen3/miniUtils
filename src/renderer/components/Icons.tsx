@@ -3,6 +3,7 @@ import IconSet, { IconSetType } from '@const/iconSet';
 
 interface IProps {
   name: IconSetType;
+  className?: string;
 }
 
 const Icons = (props: IProps) => {

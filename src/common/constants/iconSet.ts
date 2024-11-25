@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 const IconSet = {
+  logo: lazy(() => import('~icons/mySvg/logo')),
   close: lazy(() => import('~icons/mdi/window-close')),
   windowRestore: lazy(() => import('~icons/mdi/window-restore')),
   windowMinimize: lazy(() => import('~icons/mdi/window-minimize')),
