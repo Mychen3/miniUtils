@@ -1,0 +1,32 @@
+
+.menu{
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(100vh - var(--head-height) - 120px);
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+.menuItem{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  svg{
+    margin-right: 8px;
+  }
+
+  span{
+    font-weight: 600;
+    font-family: 'font-lxg';
+    letter-spacing: 0.1em;
+  }
+
+  &:hover {
+    background-color: hsl(var(--theme-default-200));
+  }
+}
