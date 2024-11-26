@@ -2,8 +2,24 @@
   --head-height: 28px;
 }
 
+@font-face {
+  font-family: 'font-logo';
+  src: url('@assets/fonts/logoText.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'font-lxg';
+  src: url('@assets/fonts/Lxg.ttf') format('truetype');
+  font-weight: normal;
+}
+
+
+
 #root {
   width: 100vw;
   height: 100vh;
-
 }
+
+
+

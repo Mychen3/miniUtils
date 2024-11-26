@@ -1,5 +1,5 @@
 import Layout from '@pages/layout';
-import HomePage from '../pages/homePage';
+import menuRoutes from './module/menu';
 
 const routes = [
   {
@@ -8,15 +8,7 @@ const routes = [
     meta: {
       title: '布局栏',
     },
-    children: [
-      {
-        path: '',
-        element: <HomePage />,
-        meta: {
-          title: '首页',
-        },
-      },
-    ],
+    children: menuRoutes,
   },
 ];
 

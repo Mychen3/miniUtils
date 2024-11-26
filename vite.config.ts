@@ -13,6 +13,7 @@ export default defineConfig({
       '@hooks': join(__dirname, 'src/renderer/hooks'),
       '@utils': join(__dirname, 'src/utils'),
       '@const': join(__dirname, 'src/common/constants'),
+      '@assets': join(__dirname, 'src/assets'),
     },
   },
   css: {

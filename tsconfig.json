@@ -12,7 +12,8 @@
       "@pages/*": ["src/renderer/pages/*"],
       "@hooks/*": ["src/renderer/hooks/*"],
       "@utils/*": ["src/utils/*"],
-      "@const/*": ["src/common/constants/*"]
+      "@const/*": ["src/common/constants/*"],
+      "@assets/*": ["src/assets/*"]
     },
 
     /* Bundler mode */
