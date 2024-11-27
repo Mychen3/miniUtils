@@ -1,10 +1,11 @@
-  .logo{
+.logo {
   display: flex;
   flex-direction: column;
   align-items: center;
+  user-select: none;
 }
 
-.menu{
+.menu {
   width: 100px;
   box-sizing: border-box;
   flex: 0 0 auto;
@@ -12,7 +13,7 @@
   position: relative;
   border-right: 1px solid hsl(var(--theme-default-200));
 
-  &::before{
+  &::before {
     content: '';
     position: absolute;
     top: calc(0px - var(--head-height)); // 使用calc表达负数
@@ -22,8 +23,6 @@
     background-color: hsl(var(--theme-default-200));
   }
 }
-
-
 
 .logoText {
   font-family: 'font-logo';

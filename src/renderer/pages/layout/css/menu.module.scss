@@ -1,12 +1,13 @@
-
-.menu{
+.menu {
   box-sizing: border-box;
   width: 100%;
   height: calc(100vh - var(--head-height) - 120px);
   padding: 12px 10px;
   overflow-y: auto;
+  user-select: none;
+  position: relative;
 }
-.menuItem{
+.menuItem {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,19 +15,38 @@
   margin-bottom: 6px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  svg{
-    margin-right: 8px;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  svg {
+    position: relative;
+    z-index: 2;
+    margin-right: 6px;
   }
-
-  span{
+  span {
+    position: relative;
+    z-index: 2;
     font-weight: 600;
     font-family: 'font-lxg';
     letter-spacing: 0.1em;
   }
-
   &:hover {
     background-color: hsl(var(--theme-default-200));
   }
+}
+
+.activeMenu {
+  width: 79px;
+  border-radius: 8px;
+  height: 40px;
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  z-index: 1;
+  transition: transform 0.3s ease;
+  background-color: hsl(var(--theme-primary-500)) !important;
+}
+
+.activeMenuStyle {
+  color: #f4f5f5 !important;
 }
