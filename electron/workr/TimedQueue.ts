@@ -1,4 +1,4 @@
-type QueueItem = {
+export type QueueItem = {
   // 时间戳
   time: number;
   taskName: string;
@@ -18,6 +18,7 @@ export class TimedQueue {
 
   constructor(interval?: number) {
     this.interval = interval ?? 3000;
+
     if (!TimedQueue.instance) TimedQueue.instance = this;
     return TimedQueue.instance;
   }
