@@ -11,12 +11,12 @@ export class TimedQueue {
   private timer: NodeJS.Timeout | null = null;
   private interval: number;
 
-  public static getInstance(interval: number = 3000): TimedQueue {
-    if (!TimedQueue.instance) TimedQueue.instance = new TimedQueue(interval);
+  public static getInstance(interval?: number): TimedQueue {
+    if (!TimedQueue.instance) TimedQueue.instance = new TimedQueue(interval ?? 3000);
     return TimedQueue.instance;
   }
 
-  private constructor(interval: number) {
+  constructor(interval?: number) {
     this.interval = interval ?? 3000;
     if (!TimedQueue.instance) TimedQueue.instance = this;
     return TimedQueue.instance;
