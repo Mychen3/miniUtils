@@ -2,7 +2,7 @@ import HomePage from '@pages/homePage/index';
 import Todo from '@pages/menu/todo';
 import type { IconSetType } from '@src/common/constants/iconSet';
 
-export type IMenutTypeItem = {
+export type IMenuTypeItem = {
   path: string;
   element: React.ReactNode;
   meta: {
@@ -12,7 +12,7 @@ export type IMenutTypeItem = {
   };
 };
 
-const routes: IMenutTypeItem[] = [
+const routes: IMenuTypeItem[] = [
   {
     path: '',
     element: <HomePage />,

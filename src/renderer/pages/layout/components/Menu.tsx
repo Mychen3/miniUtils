@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import styles from '../css/menu.module.scss';
 import menuRoutes from '@src/renderer/router/module/menu';
 import Icons from '@src/renderer/components/Icons';
-import type { IMenutTypeItem } from '@src/renderer/router/module/menu';
+import type { IMenuTypeItem } from '@src/renderer/router/module/menu';
 import { useNavigate } from 'react-router-dom';
 
 const Menu = () => {
@@ -10,7 +10,7 @@ const Menu = () => {
   const [activeMenu, setActiveMenu] = useState('');
   const activeIndex = useRef(0);
 
-  const onClickSelectMenu = (item: IMenutTypeItem, index: number) => {
+  const onClickSelectMenu = (item: IMenuTypeItem, index: number) => {
     navigate(item.path);
     setActiveMenu(item.path);
     activeIndex.current = index;
