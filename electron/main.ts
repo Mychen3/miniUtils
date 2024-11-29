@@ -2,9 +2,17 @@ import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { IpcKey } from './ipc/ipcKey.ts';
-import { changeWindowSize, setWindowPin, windowClose, windowHide, windowMinimize } from './ipc/mainIpc.ts';
+import {
+  changeWindowSize,
+  setWindowPin,
+  windowClose,
+  windowHide,
+  windowMinimize,
+  addTimedQueue,
+} from './ipc/mainIpc.ts';
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
+import TimedQueue from './workr/TimedQueue.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -16,6 +24,7 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist');
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST;
 
 let win: BrowserWindow | null;
+let timedQueue: TimedQueue;
 function createWindow() {
   const isMac = process.platform === systemKey.mac;
   win = new BrowserWindow({
@@ -34,19 +43,20 @@ function createWindow() {
   });
   win.on('ready-to-show', () => {
     win?.show(); // 初始化后再显示
+    timedQueue = new TimedQueue(3000);
   });
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString());
   });
   VITE_DEV_SERVER_URL ? win.loadURL(VITE_DEV_SERVER_URL) : win.loadFile(path.join(RENDERER_DIST, 'index.html'));
   app.isPackaged || win.webContents.openDevTools();
-
   const ipcMainMap = new Map<IpcKey, (event: IpcMainEvent, ...args: any[]) => void>([
     [IpcKey.close, windowClose],
     [IpcKey.windowHide, windowHide],
     [IpcKey.windowMinimize, windowMinimize],
     [IpcKey.changeWindowSize, changeWindowSize],
     [IpcKey.setWindowPin, setWindowPin],
+    [IpcKey.addTimedQueue, addTimedQueue],
   ]);
   ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
 
