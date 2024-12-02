@@ -8,6 +8,9 @@ const IconSet = {
   windowPin: lazy(() => import('~icons/mdi/pin-outline')),
   home: lazy(() => import('~icons/mdi/home-lightning-bolt-outline')),
   todo: lazy(() => import('~icons/mdi/todo-auto')),
+  user: lazy(() => import('~icons/mdi/user-tie')),
+  password: lazy(() => import('~icons/mdi/password')),
+  verifiedUser: lazy(() => import('~icons/mdi/verified-user')),
 };
 
 type IconSetType = keyof typeof IconSet;

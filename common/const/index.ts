@@ -4,4 +4,8 @@ enum systemKey {
   linux = 'linux',
 }
 
-export { systemKey };
+const TgErrorConst: Record<string, string> = {
+  PHONE_CODE_INVALI: '验证码不正确，重新输入',
+};
+
+export { systemKey, TgErrorConst };

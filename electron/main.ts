@@ -13,7 +13,7 @@ import {
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
 import TimedQueue from './workr/TimedQueue.ts';
-
+import { loginTg } from './telegramCore';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, '..');
@@ -57,6 +57,7 @@ function createWindow() {
     [IpcKey.changeWindowSize, changeWindowSize],
     [IpcKey.setWindowPin, setWindowPin],
     [IpcKey.addTimedQueue, addTimedQueue],
+    [IpcKey.loginTg, loginTg],
   ]);
   ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
 

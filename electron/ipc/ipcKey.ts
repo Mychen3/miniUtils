@@ -6,4 +6,8 @@ export enum IpcKey {
   setWindowPin = 'setWindowPin', // 窗口置顶
   addTimedQueue = 'addTimedQueue', // 添加定时任务
   onTimedQueueTask = 'onTimedQueueTask', // 定时任务
+  loginTg = 'loginTg', // 登录TG
+  confirmPhoneCode = 'confirmPhoneCode', // 确认手机验证码
+  onConfirmPhoneCodeSend = 'onConfirmPhoneCodeSend', // 发送手机验证码
+  onToastMessage = 'onToastMessage', // 提示
 }

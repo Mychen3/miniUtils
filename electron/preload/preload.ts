@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { IpcKey } from '../ipc/ipcKey.ts';
 import type { QueueItem } from '../workr/TimedQueue.ts';
+import type { TypeOptions } from 'react-toastify';
 
 const electronAPI = {
   windowClose: () => ipcRenderer.send(IpcKey.close),
@@ -11,6 +12,12 @@ const electronAPI = {
   addTimedQueue: (target: Omit<QueueItem, 'callback'>) => ipcRenderer.send(IpcKey.addTimedQueue, target),
   onTimedQueueTask: (callback: (event: IpcRendererEvent, taskName: string) => void) =>
     ipcRenderer.on(IpcKey.onTimedQueueTask, callback),
+  loginTg: (params: { username: string; password?: string }) => ipcRenderer.send(IpcKey.loginTg, params),
+  confirmPhoneCode: (code: string) => ipcRenderer.send(IpcKey.confirmPhoneCode, code),
+  onConfirmPhoneCodeSend: (callback: (event: IpcRendererEvent) => void) =>
+    ipcRenderer.on(IpcKey.onConfirmPhoneCodeSend, callback),
+  onToastMessage: (callback: (event: IpcRendererEvent, message: string, type: TypeOptions) => void) =>
+    ipcRenderer.on(IpcKey.onToastMessage, callback),
 };
 
 export type IElectronAPI = typeof electronAPI;

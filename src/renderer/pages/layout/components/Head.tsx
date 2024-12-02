@@ -4,6 +4,9 @@ import { useState, useMemo } from 'react';
 import type { IconSetType } from '@const/iconSet.ts';
 import { useCreation, useMemoizedFn } from 'ahooks';
 import { systemKey } from '@const/publicConst.ts';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+import { useMount } from 'ahooks';
+import 'react-toastify/dist/ReactToastify.css';
 
 type IConsItem = {
   name: IconSetType;
@@ -65,19 +68,43 @@ const Head = () => {
     actionMap[target.name]?.();
   });
 
+  const onToastMessage = useMemoizedFn(() => {
+    window.electronAPI.onToastMessage((_event, message, type) => {
+      toast(message, {
+        type,
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+        transition: Bounce,
+      });
+    });
+  });
+
+  useMount(() => {
+    onToastMessage();
+  });
+
   return (
-    <div className={containerClass}>
-      <div className={dragClass}></div>
-      {isMac && (
-        <div className={styles.iconsBox}>
-          {handIcons.map((item) => (
-            <div key={item.name} className={item.hoverClass} onClick={() => onClickIcon(item)}>
-              <Icons name={item.icon}></Icons>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <>
+      <div className={containerClass}>
+        <div className={dragClass}></div>
+        {isMac && (
+          <div className={styles.iconsBox}>
+            {handIcons.map((item) => (
+              <div key={item.name} className={item.hoverClass} onClick={() => onClickIcon(item)}>
+                <Icons name={item.icon}></Icons>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <ToastContainer />
+    </>
   );
 };
 export default Head;
