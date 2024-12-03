@@ -13,7 +13,8 @@
       "@hooks/*": ["src/renderer/hooks/*"],
       "@utils/*": ["src/utils/*"],
       "@const/*": ["src/common/constants/*"],
-      "@assets/*": ["src/assets/*"]
+      "@assets/*": ["src/assets/*"],
+      "@components/*": ["src/renderer/components/*"]
     },
 
     /* Bundler mode */
