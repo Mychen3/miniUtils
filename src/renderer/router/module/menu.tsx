@@ -17,8 +17,8 @@ const routes: IMenuTypeItem[] = [
     path: '',
     element: <HomePage />,
     meta: {
-      title: '盒子',
-      icon: 'home',
+      title: '账号',
+      icon: 'user',
       className: 'w-[22px] h-[22px]',
     },
   },

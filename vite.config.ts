@@ -32,7 +32,7 @@ export default defineConfig({
         vite: {
           build: {
             rollupOptions: {
-              external: ['telegram'],
+              external: ['telegram', 'better-sqlite3'],
             },
           },
         },

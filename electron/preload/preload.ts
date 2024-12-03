@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { IpcKey } from '../ipc/ipcKey.ts';
 import type { QueueItem } from '../workr/TimedQueue.ts';
 import type { TypeOptions } from 'react-toastify';
+import { tgLoginHandle } from '../../common/const';
 
 const electronAPI = {
   windowClose: () => ipcRenderer.send(IpcKey.close),
@@ -14,8 +15,8 @@ const electronAPI = {
     ipcRenderer.on(IpcKey.onTimedQueueTask, callback),
   loginTg: (params: { username: string; password?: string }) => ipcRenderer.send(IpcKey.loginTg, params),
   confirmPhoneCode: (code: string) => ipcRenderer.send(IpcKey.confirmPhoneCode, code),
-  onConfirmPhoneCodeSend: (callback: (event: IpcRendererEvent) => void) =>
-    ipcRenderer.on(IpcKey.onConfirmPhoneCodeSend, callback),
+  onTgLoginHandle: (callback: (event: IpcRendererEvent, handle: keyof typeof tgLoginHandle) => void) =>
+    ipcRenderer.on(IpcKey.onTgLoginHandle, callback),
   onToastMessage: (callback: (event: IpcRendererEvent, message: string, type: TypeOptions) => void) =>
     ipcRenderer.on(IpcKey.onToastMessage, callback),
 };

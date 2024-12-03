@@ -1,8 +1,12 @@
-import { ipcMain, BrowserWindow, IpcMainEvent } from 'electron';
+import { BrowserWindow, IpcMainEvent } from 'electron';
 import { TelegramClient, sessions, Api } from 'telegram';
 import { IpcKey } from '../ipc/ipcKey';
-import { TgErrorConst } from '../../common/const';
-const stringSession = new sessions.StringSession('');
+// import { TgErrorConst } from '../../common/const';
+// import { ipcMain } from 'electron';
+
+const stringSession = new sessions.StringSession(
+  '1BQANOTEuMTA4LjU2LjE3OQG7kOt8FyIUtYGB9Y9P4q4NenBFO9ibIVDpyLgGitXcrpR3xsU+U+Iqw31DRQOWah1bXIKurSa0b7mLBSKBwDoZQz0zcyHLA5Omdc1IPSOwveZlzk5qEN9p+qiC7O+ag/OoQTJ5wlEkI07jdN9ck8a0WE8mXyh7rmh/rSe7s3hMQOca33qZ8KI0uCafoY+HuFxzwke3LggJGVHvUolvVYfTSD+Z4ucohzkPVdl2K+BUdFqqOSeGSwqQqbviR7zY0kPuO8oLvXYktLK2SxUx8x9dFcWuddvQhKXuKDuyP6/2embLsiWqrW5NnZmARlpKJmfop/hkU3FE02ZB+g9C7YjULQ==',
+);
 let client: TelegramClient;
 
 const initTg = async () => {
@@ -22,6 +26,37 @@ const sendBotQueryStatus = async () => {
         message: '/start',
         noWebpage: true,
         noforwards: true,
+        clearDraft: false,
+      }),
+    );
+
+    setTimeout(async () => {
+      const message = await client.getMessages('@SpamBot', { limit: 1 });
+      console.log(message);
+    }, 500);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const pullGroup = async () => {
+  try {
+    // const entity = await client.getEntity('fyikbf1145');
+    // const list = await client.getDialogs();
+    // const dialog = list.find((item) => item.title === 'test');
+    // console.log(dialog);
+
+    // const result = await client.invoke(
+    //   new Api.messages.AddChatUser({
+    //     chatId: dialog?.id,
+    //     userId: '@RadomilMendoza',
+    //     fwdLimit: 10,
+    //   }),
+    // );
+    const result = await client.invoke(
+      new Api.channels.InviteToChannel({
+        channel: '@fyikbf1145',
+        users: [],
       }),
     );
     console.log(result);
@@ -40,8 +75,9 @@ const loginTg = async (event: IpcMainEvent, params: { username: string; password
     //     const result: string = await new Promise((resolve) => {
     //       ipcMain.once(IpcKey.confirmPhoneCode, (_event: IpcMainEvent, code: string) => resolve(code));
     //       const win = BrowserWindow.fromWebContents(event.sender);
-    //       win?.webContents.send(IpcKey.onConfirmPhoneCodeSend);
+    //       win?.webContents.send(IpcKey.onTgLoginHandle);
     //     });
+    //     console.log(result);
     //     return result;
     //   },
     //   password: params.password ? () => Promise.resolve(params.password) : undefined,
@@ -54,6 +90,10 @@ const loginTg = async (event: IpcMainEvent, params: { username: string; password
     const key = client.session.save();
     console.log(key);
     await client.connect();
+    // 获取用户实体
+    // const user = await client.getMe();
+    // console.log('User Info:', user);
+    // await pullGroup();
     await sendBotQueryStatus();
   } catch (error) {
     const win = BrowserWindow.fromWebContents(event.sender);

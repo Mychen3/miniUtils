@@ -8,6 +8,6 @@ export enum IpcKey {
   onTimedQueueTask = 'onTimedQueueTask', // 定时任务
   loginTg = 'loginTg', // 登录TG
   confirmPhoneCode = 'confirmPhoneCode', // 确认手机验证码
-  onConfirmPhoneCodeSend = 'onConfirmPhoneCodeSend', // 发送手机验证码
+  onTgLoginHandle = 'onTgLoginHandle', //  监听tg登录相关事件
   onToastMessage = 'onToastMessage', // 提示
 }

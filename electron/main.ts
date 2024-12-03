@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { IpcKey } from './ipc/ipcKey.ts';
+import { initDb, closeDb, getDb } from './db/database';
 import {
   changeWindowSize,
   setWindowPin,
@@ -12,8 +13,9 @@ import {
 } from './ipc/mainIpc.ts';
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
-import TimedQueue from './workr/TimedQueue.ts';
+// import TimedQueue from './workr/TimedQueue.ts';
 import { loginTg } from './telegramCore';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, '..');
@@ -24,16 +26,17 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist');
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST;
 
 let win: BrowserWindow | null;
-let timedQueue: TimedQueue;
+
+// let timedQueue: TimedQueue;
 function createWindow() {
   const isMac = process.platform === systemKey.mac;
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'logo.png'),
     frame: isMac,
     titleBarStyle: isMac ? 'hidden' : 'default',
-    height: 760,
-    width: 930,
-    minHeight: 680,
+    height: 660,
+    width: 830,
+    minHeight: 580,
     minWidth: 780,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
@@ -43,7 +46,7 @@ function createWindow() {
   });
   win.on('ready-to-show', () => {
     win?.show(); // 初始化后再显示
-    timedQueue = new TimedQueue(3000);
+    // timedQueue = new TimedQueue(3000);
   });
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString());
@@ -76,6 +79,9 @@ app.on('window-all-closed', () => {
 app.on('quit', () => {
   destroyTray();
 });
+app.on('before-quit', () => {
+  if (getDb()) closeDb();
+});
 
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
@@ -88,4 +94,5 @@ app.on('activate', () => {
 app.whenReady().then(() => {
   createTray(path.join(process.env.VITE_PUBLIC, 'logo.png'));
   createWindow();
+  // initDb(path.join(app.getPath('userData'), 'database.db'));
 });

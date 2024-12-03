@@ -25,7 +25,7 @@ const Login = ({ isOpen, onOpenChange }: ILoginProps) => {
     });
 
   useMount(() => {
-    window.electronAPI.onConfirmPhoneCodeSend(async () => {
+    window.electronAPI.onTgLoginHandle(async (event, handle) => {
       const phoneCode = await showModal();
       window.electronAPI.confirmPhoneCode(phoneCode as string);
     });
