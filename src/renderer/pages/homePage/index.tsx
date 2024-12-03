@@ -1,5 +1,4 @@
 import {
-  Switch,
   Table,
   TableHeader,
   TableColumn,
@@ -8,15 +7,53 @@ import {
   TableCell,
   Input,
   Button,
+  useDisclosure,
+  Tooltip,
+  Pagination,
 } from '@nextui-org/react';
 import styles from './css/index.module.scss';
-import useTheme from '@hooks/useTheme.ts';
-import { Theme } from '@const/publicConst.ts';
-import { ChangeEvent, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { SearchIcon } from '@nextui-org/shared-icons';
+import Login from './components/Login';
+import { useMemoizedFn, useMount } from 'ahooks';
+import type { IUserItem } from 'electron/db/module/user';
+import Icons from '@components/Icons';
+import StatusTag from './components/StatusTag';
 
 const HomePage = () => {
   const [nameSearch, setNameSearch] = useState('');
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [loading, setLoading] = useState(false);
+  const [params, setParams] = useState({
+    page: 1,
+    pageSize: 20,
+    search: '',
+  });
+  const [list, setList] = useState<IUserItem[]>([]);
+  const [total, setTotal] = useState(0);
+
+  const getlist = useMemoizedFn(async () => {
+    setLoading(true);
+    const res = await window.electronAPI.getPageUsers(params);
+    setList([...res.list]);
+    setTotal(res.total);
+    setLoading(false);
+  });
+
+  const deleteUser = async (userItem: IUserItem) => {
+    await window.electronAPI.deleteUser(userItem);
+    getlist();
+  };
+
+  const refreshUserStatus = async (user_id: number) => {
+    setLoading(true);
+    await window.electronAPI.refreshUserStatus(user_id);
+    getlist();
+  };
+
+  useMount(async () => {
+    getlist();
+  });
 
   return (
     <div className={styles.container}>
@@ -39,27 +76,72 @@ const HomePage = () => {
           <Button size="sm" color="primary">
             搜索
           </Button>
-          <Button size="sm" color="primary">
+          <Button size="sm" color="primary" onClick={onOpen} endContent={<Icons name="add" />}>
             添加账号
           </Button>
         </div>
-        <Table aria-label="Example static collection table">
+        <Table
+          isStriped
+          isHeaderSticky
+          aria-label="Example static collection table"
+          classNames={{
+            base: 'h-[79vh] scrollbar-y-hidden',
+            thead: 'top-[-16px]',
+          }}
+        >
           <TableHeader>
-            <TableColumn>用户名</TableColumn>
-            <TableColumn>头像</TableColumn>
-            <TableColumn>状态</TableColumn>
-            <TableColumn>操作</TableColumn>
+            <TableColumn align="center">用户名</TableColumn>
+            <TableColumn align="center">手机号</TableColumn>
+            <TableColumn align="center">TGId</TableColumn>
+            <TableColumn align="center">状态</TableColumn>
+            <TableColumn align="center">操作</TableColumn>
           </TableHeader>
-          <TableBody>
-            <TableRow key="1">
-              <TableCell>Tony Reichert</TableCell>
-              <TableCell>CEO</TableCell>
-              <TableCell>Active</TableCell>
-              <TableCell>Active</TableCell>
-            </TableRow>
+          <TableBody emptyContent="暂无数据" isLoading={loading}>
+            {list.map((item) => (
+              <TableRow key={item.user_id}>
+                <TableCell>{item.user_name}</TableCell>
+                <TableCell>+{item.user_phone}</TableCell>
+                <TableCell>@{item.user_tg_id}</TableCell>
+                <TableCell>
+                  <StatusTag status={item.user_status} />
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2 justify-center">
+                    <Tooltip content="刷新">
+                      <span
+                        className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                        onClick={() => refreshUserStatus(item.user_id)}
+                      >
+                        <Icons name="refresh" />
+                      </span>
+                    </Tooltip>
+                    <Tooltip color="danger" content="删除">
+                      <span
+                        className="text-lg text-danger cursor-pointer active:opacity-50"
+                        onClick={() => deleteUser(item)}
+                      >
+                        <Icons name="delete" />
+                      </span>
+                    </Tooltip>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
+        <div className="flex w-full justify-center mt-[10px]">
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            color="primary"
+            page={params.page}
+            total={total}
+            onChange={(page) => setParams({ ...params, page })}
+          />
+        </div>
       </div>
+      <Login refreshList={getlist} onClose={onClose} isOpen={isOpen} onOpenChange={onOpenChange} />
     </div>
   );
 };

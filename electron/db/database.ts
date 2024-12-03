@@ -15,10 +15,6 @@ const initDb = (path: string) => {
   if (!checkIfTableExists('users')) db.exec(createUserSql);
 };
 
-const getDb = () => db;
+const closeDb = () => db?.close();
 
-const closeDb = () => {
-  db.close();
-};
-
-export { initDb, closeDb, getDb };
+export { initDb, closeDb, db };

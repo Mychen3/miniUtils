@@ -7,10 +7,16 @@ enum systemKey {
 enum tgLoginHandle {
   loginStart = 'loginStart',
   loginEnd = 'loginEnd',
+  verifyPhoneCode = 'verifyPhoneCode',
+}
+
+enum passKey {
+  pass = 'pass',
+  warn = 'warn',
 }
 
 const TgErrorConst: Record<string, string> = {
   PHONE_CODE_INVALI: '验证码不正确，重新输入',
 };
 
-export { systemKey, TgErrorConst, tgLoginHandle };
+export { systemKey, TgErrorConst, tgLoginHandle, passKey };

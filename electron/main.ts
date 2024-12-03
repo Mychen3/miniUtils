@@ -1,8 +1,8 @@
-import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { IpcKey } from './ipc/ipcKey.ts';
-import { initDb, closeDb, getDb } from './db/database';
+import { initDb, closeDb } from './db/database';
 import {
   changeWindowSize,
   setWindowPin,
@@ -14,7 +14,8 @@ import {
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
 // import TimedQueue from './workr/TimedQueue.ts';
-import { loginTg } from './telegramCore';
+import { handleLogin, refreshUserStatus } from './telegramCore';
+import { deleteUser, getPageUsers } from './db/module/user.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -60,12 +61,20 @@ function createWindow() {
     [IpcKey.changeWindowSize, changeWindowSize],
     [IpcKey.setWindowPin, setWindowPin],
     [IpcKey.addTimedQueue, addTimedQueue],
-    [IpcKey.loginTg, loginTg],
+    [IpcKey.loginTg, handleLogin],
+  ]);
+
+  const ipcMainHandMap = new Map<IpcKey, (event: IpcMainInvokeEvent, ...args: any[]) => void>([
+    [IpcKey.getPageUsers, getPageUsers],
+    [IpcKey.deleteUser, deleteUser],
+    [IpcKey.refreshUserStatus, refreshUserStatus],
   ]);
   ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
+  ipcMainHandMap.forEach((value, key) => ipcMain.handle(key, value));
 
   win.on('closed', () => {
     ipcMainMap.forEach((_value, key) => ipcMain.removeAllListeners(key));
+    ipcMainHandMap.forEach((_value, key) => ipcMain.removeHandler(key));
   });
 }
 
@@ -80,7 +89,7 @@ app.on('quit', () => {
   destroyTray();
 });
 app.on('before-quit', () => {
-  if (getDb()) closeDb();
+  closeDb();
 });
 
 app.on('activate', () => {
@@ -94,5 +103,5 @@ app.on('activate', () => {
 app.whenReady().then(() => {
   createTray(path.join(process.env.VITE_PUBLIC, 'logo.png'));
   createWindow();
-  // initDb(path.join(app.getPath('userData'), 'database.db'));
+  initDb(path.join(app.getPath('userData'), 'database.db'));
 });

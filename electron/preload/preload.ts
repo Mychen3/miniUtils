@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { IpcKey } from '../ipc/ipcKey.ts';
+import { tgLoginHandle } from '../../common/const';
 import type { QueueItem } from '../workr/TimedQueue.ts';
 import type { TypeOptions } from 'react-toastify';
-import { tgLoginHandle } from '../../common/const';
+import type { IUserItem } from '../db/module/user';
 
 const electronAPI = {
   windowClose: () => ipcRenderer.send(IpcKey.close),
@@ -19,6 +20,10 @@ const electronAPI = {
     ipcRenderer.on(IpcKey.onTgLoginHandle, callback),
   onToastMessage: (callback: (event: IpcRendererEvent, message: string, type: TypeOptions) => void) =>
     ipcRenderer.on(IpcKey.onToastMessage, callback),
+  getPageUsers: (params: { page: number; pageSize: number; search: string }) =>
+    ipcRenderer.invoke(IpcKey.getPageUsers, params) as Promise<{ list: IUserItem[]; total: number }>,
+  deleteUser: (userItem: IUserItem) => ipcRenderer.invoke(IpcKey.deleteUser, userItem),
+  refreshUserStatus: (user_id: number) => ipcRenderer.invoke(IpcKey.refreshUserStatus, user_id),
 };
 
 export type IElectronAPI = typeof electronAPI;

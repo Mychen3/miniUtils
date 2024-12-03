@@ -3,21 +3,30 @@ import { useState, useRef } from 'react';
 import { useDisclosure } from '@nextui-org/react';
 import Icons from '@src/renderer/components/Icons';
 import { useMount } from 'ahooks';
+import { tgLoginHandle } from '@src/../common/const/index';
+
 type ILoginProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  refreshList: () => void;
+  onClose: () => void;
 };
 
-const Login = ({ isOpen, onOpenChange }: ILoginProps) => {
+const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
   const [inputParams, setInputParams] = useState({
     username: '',
     password: '',
   });
   const resolvePromise = useRef<((value: string) => void) | null>(null);
   const [phoneCode, setPhoneCode] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
   const { isOpen: isPhoneCodeOpen, onOpen: onPhoneCodeOpen, onOpenChange: onPhoneCodeOpenChange } = useDisclosure();
 
-  const onLogin = () => window.electronAPI.loginTg(inputParams);
+  const onLogin = () => {
+    setLoginLoading(true);
+    window.electronAPI.loginTg(inputParams);
+  };
+
   const showModal = () =>
     new Promise((resolve) => {
       onPhoneCodeOpen();
@@ -25,9 +34,19 @@ const Login = ({ isOpen, onOpenChange }: ILoginProps) => {
     });
 
   useMount(() => {
-    window.electronAPI.onTgLoginHandle(async (event, handle) => {
-      const phoneCode = await showModal();
-      window.electronAPI.confirmPhoneCode(phoneCode as string);
+    window.electronAPI.onTgLoginHandle(async (_event, handle) => {
+      if (handle === tgLoginHandle.verifyPhoneCode) {
+        const phoneCode = await showModal();
+        window.electronAPI.confirmPhoneCode(phoneCode as string);
+      } else if (handle === tgLoginHandle.loginEnd) {
+        setLoginLoading(false);
+        onClose();
+        setInputParams({
+          username: '',
+          password: '',
+        });
+        refreshList();
+      }
     });
   });
 
@@ -43,7 +62,7 @@ const Login = ({ isOpen, onOpenChange }: ILoginProps) => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">登录TG</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">添加账号</ModalHeader>
               <ModalBody>
                 <Input
                   endContent={
@@ -69,7 +88,7 @@ const Login = ({ isOpen, onOpenChange }: ILoginProps) => {
                 <Button color="danger" variant="flat" onPress={onClose}>
                   关闭
                 </Button>
-                <Button color="primary" onPress={onLogin}>
+                <Button color="primary" onPress={onLogin} isLoading={loginLoading}>
                   登录
                 </Button>
               </ModalFooter>

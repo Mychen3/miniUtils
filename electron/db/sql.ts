@@ -10,8 +10,8 @@ const createUserSql = `
         )
     `;
 const insertUserSql = `
-        INSERT INTO users (user_name, user_status, user_phone, user_avatar, user_tg_id, session_id)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO users (user_name, user_status, user_phone, user_tg_id, session_id)
+        VALUES (?, ?, ?, ?, ?)
     `;
 
 export { createUserSql, insertUserSql };

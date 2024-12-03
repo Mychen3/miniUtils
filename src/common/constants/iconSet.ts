@@ -11,6 +11,11 @@ const IconSet = {
   user: lazy(() => import('~icons/mdi/user-tie')),
   password: lazy(() => import('~icons/mdi/password')),
   verifiedUser: lazy(() => import('~icons/mdi/verified-user')),
+  add: lazy(() => import('~icons/mdi/add')),
+  checkCircle: lazy(() => import('~icons/mdi/check-circle')),
+  closeCircle: lazy(() => import('~icons/mdi/close-circle')),
+  delete: lazy(() => import('~icons/mdi/delete')),
+  refresh: lazy(() => import('~icons/mdi/refresh')),
 };
 
 type IconSetType = keyof typeof IconSet;

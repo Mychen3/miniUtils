@@ -10,4 +10,7 @@ export enum IpcKey {
   confirmPhoneCode = 'confirmPhoneCode', // 确认手机验证码
   onTgLoginHandle = 'onTgLoginHandle', //  监听tg登录相关事件
   onToastMessage = 'onToastMessage', // 提示
+  getPageUsers = 'getPageUsers', // 获取分页用户
+  deleteUser = 'deleteUser', // 删除用户
+  refreshUserStatus = 'refreshUserStatus', // 刷新用户状态
 }
