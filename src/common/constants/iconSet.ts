@@ -18,6 +18,12 @@ const IconSet = {
   refresh: lazy(() => import('~icons/mdi/refresh')),
   bellOutline: lazy(() => import('~icons/mdi/bell-outline')),
   userAddOutline: lazy(() => import('~icons/mdi/user-multiple-add-outline')),
+  databaseImportOutline: lazy(() => import('~icons/mdi/database-import-outline')),
+  stopwatchStartOutline: lazy(() => import('~icons/mdi/stopwatch-start-outline')),
+  accountGroupOutline: lazy(() => import('~icons/mdi/account-group-outline')),
+  accountSuccessOutline: lazy(() => import('~icons/mdi/account-success-outline')),
+  weatherTime: lazy(() => import('~icons/mdi/weather-time')),
+  errorOutline: lazy(() => import('~icons/mdi/error-outline')),
 };
 
 type IconSetType = keyof typeof IconSet;

@@ -86,9 +86,9 @@ const HomePage = () => {
           isHeaderSticky
           aria-label="Example static collection table"
           classNames={{
-            base: 'h-[79vh] scrollbar-y-hidden',
+            base: 'h-[calc(100vh-140px)] scrollbar-y-hidden',
             thead: 'top-[-16px]',
-            wrapper: 'h-[79vh]',
+            wrapper: 'h-[calc(100vh-140px)]',
           }}
         >
           <TableHeader>

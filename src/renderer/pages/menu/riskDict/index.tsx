@@ -57,9 +57,9 @@ const RiskDict = () => {
           isHeaderSticky
           aria-label="Example static collection table"
           classNames={{
-            base: 'h-[85vh] scrollbar-y-hidden',
+            base: 'h-[calc(100vh-90px)] scrollbar-y-hidden',
             thead: 'top-[-16px]',
-            wrapper: 'h-[85vh]',
+            wrapper: 'h-[calc(100vh-90px)]',
           }}
         >
           <TableHeader>

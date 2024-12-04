@@ -18,10 +18,10 @@ const addRiskDict = async (_event: IpcMainInvokeEvent, params: { riskStatus: str
   }
 };
 
-const getRiskDictList = async (_event: IpcMainInvokeEvent) => {
+const getRiskDictList = async (_event?: IpcMainInvokeEvent) => {
   try {
     const stmt = db.prepare(`SELECT * FROM risk_dict`);
-    return stmt.all();
+    return stmt.all() as RiskDictItem[];
   } catch (error) {
     throw error;
   }

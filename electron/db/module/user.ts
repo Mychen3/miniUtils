@@ -41,33 +41,44 @@ const updateUserStatus = (user_id: number, user_status: string) => {
   stmt.run(user_status, user_id);
 };
 
-const getPageUsers = async (_event: IpcMainInvokeEvent, params: { page: number; pageSize: number; search: string }) => {
+const getPageUsers = async (
+  _event: IpcMainInvokeEvent,
+  params: { page?: number; pageSize?: number; search?: string; userStatus?: string; isSession?: boolean },
+) => {
   try {
-    const { page, pageSize, search } = params;
+    const { page = 1, pageSize = Number.MAX_SAFE_INTEGER, search = '', userStatus, isSession = false } = params;
     // 计算 OFFSET 的起始位置
     const offset = (page - 1) * pageSize;
 
-    // 根据 search 参数的值动态构建 SQL 查询
+    // 根据 search 和 userStatus 参数的值动态构建 SQL 查询
     let baseQuery = `FROM users`;
-    if (search.trim() !== '') baseQuery += ` WHERE user_name LIKE ?`;
+    const queryParams: (string | number)[] = [];
+
+    if (search.trim() !== '') {
+      baseQuery += ` WHERE user_name LIKE ?`;
+      queryParams.push(`%${search}%`);
+    }
+
+    if (userStatus) {
+      baseQuery += search.trim() !== '' ? ` AND user_status = ?` : ` WHERE user_status = ?`;
+      queryParams.push(userStatus);
+    }
+
     const selectUsersSql = `SELECT * ${baseQuery} LIMIT ? OFFSET ?`;
     const countUsersSql = `SELECT COUNT(*) as total ${baseQuery}`;
 
     const stmt = await db.prepare(selectUsersSql);
     const countStmt = await db.prepare(countUsersSql);
 
-    // 根据是否有搜索关键字传入不同的参数
-    let users, totalResult;
-    if (search.trim() !== '') {
-      users = stmt.all(`%${search}%`, pageSize, offset);
-      totalResult = countStmt.get(`%${search}%`);
-    } else {
-      users = stmt.all(pageSize, offset);
-      totalResult = countStmt.get();
-    }
+    // 添加 LIMIT 和 OFFSET 参数
+    queryParams.push(pageSize, offset);
+
+    const users = stmt.all(...queryParams);
+    const totalResult = countStmt.get(...queryParams.slice(0, -2));
 
     return {
       list: users.map((item) => {
+        if (isSession) return item;
         const { session_id: _, ...rest } = item as IUserItem;
         return rest;
       }),

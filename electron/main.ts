@@ -39,8 +39,8 @@ function createWindow() {
     titleBarStyle: isMac ? 'hidden' : 'default',
     height: 660,
     width: 830,
-    minHeight: 580,
-    minWidth: 780,
+    minHeight: 660,
+    minWidth: 830,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       contextIsolation: true, // 启用上下文隔离
@@ -114,5 +114,5 @@ app.whenReady().then(() => {
   createTray(path.join(process.env.VITE_PUBLIC, 'logo.png'));
   createWindow();
   initDb(path.join(app.getPath('userData'), 'database.db'));
-  registerKeyboard();
+  if (app.isPackaged) registerKeyboard();
 });
