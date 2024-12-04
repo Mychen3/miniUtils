@@ -8,6 +8,7 @@ enum tgLoginHandle {
   loginStart = 'loginStart',
   loginEnd = 'loginEnd',
   verifyPhoneCode = 'verifyPhoneCode',
+  loginError = 'loginError',
 }
 
 enum passKey {

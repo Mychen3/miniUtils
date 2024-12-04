@@ -1,4 +1,4 @@
-const { globalShortcut } = require('electron');
+import { globalShortcut } from 'electron';
 
 const registerKeyboard = () => {
   globalShortcut.register('CommandOrControl+R', () => false);

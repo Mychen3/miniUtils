@@ -115,7 +115,6 @@ const handleLogin = async (_event: IpcMainEvent, params: { username: string; pas
         });
         return result;
       },
-      password: params.password ? () => Promise.resolve(params.password) : undefined,
       onError: (error) => {
         const message = TgErrorConst[error.message];
         win?.webContents.send(IpcKey.onToastMessage, message, 'error');
@@ -132,8 +131,7 @@ const handleLogin = async (_event: IpcMainEvent, params: { username: string; pas
     }
     win?.webContents.send(IpcKey.onTgLoginHandle, tgLoginHandle.loginEnd);
   } catch (error) {
-    console.error(error);
-    win?.webContents.send(IpcKey.onToastMessage, '操作失败', 'error');
+    win?.webContents.send(IpcKey.onTgLoginHandle, tgLoginHandle.loginError);
   }
 };
 
