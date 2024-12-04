@@ -33,7 +33,7 @@ export const createTray = (iconPath: string) => {
   tray = new Tray(trayIcon);
   tray.setImage(trayIcon);
   tray.setContextMenu(menuTray);
-  tray.setToolTip('MiniUtils');
+  tray.setToolTip('TGUtils');
   tray.on('double-click', openWin);
 };
 

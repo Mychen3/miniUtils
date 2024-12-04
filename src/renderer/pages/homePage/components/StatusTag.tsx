@@ -11,6 +11,7 @@ const StatusTag = ({ status }: { status: string }) => {
       size="sm"
       startContent={<Icons name={isPass ? 'checkCircle' : 'closeCircle'} />}
       color={isPass ? 'success' : 'danger'}
+      variant="flat"
     >
       {isPass ? '正常' : '风险'}
     </Chip>

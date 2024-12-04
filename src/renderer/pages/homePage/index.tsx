@@ -10,6 +10,7 @@ import {
   useDisclosure,
   Tooltip,
   Pagination,
+  Spinner,
 } from '@nextui-org/react';
 import styles from './css/index.module.scss';
 import { useState } from 'react';
@@ -23,7 +24,7 @@ import StatusTag from './components/StatusTag';
 const HomePage = () => {
   const [nameSearch, setNameSearch] = useState('');
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [params, setParams] = useState({
     page: 1,
     pageSize: 20,
@@ -87,6 +88,7 @@ const HomePage = () => {
           classNames={{
             base: 'h-[79vh] scrollbar-y-hidden',
             thead: 'top-[-16px]',
+            wrapper: 'h-[79vh]',
           }}
         >
           <TableHeader>
@@ -96,12 +98,28 @@ const HomePage = () => {
             <TableColumn align="center">状态</TableColumn>
             <TableColumn align="center">操作</TableColumn>
           </TableHeader>
-          <TableBody emptyContent="暂无数据" isLoading={loading}>
+          <TableBody
+            emptyContent="暂无数据"
+            isLoading={loading}
+            loadingContent={
+              <Spinner
+                label="加载中..."
+                size="lg"
+                classNames={{
+                  label: styles.someClass,
+                }}
+              />
+            }
+          >
             {list.map((item) => (
               <TableRow key={item.user_id}>
                 <TableCell>{item.user_name}</TableCell>
-                <TableCell>+{item.user_phone}</TableCell>
-                <TableCell>@{item.user_tg_id}</TableCell>
+                <TableCell>
+                  <span>+{item.user_phone}</span>
+                </TableCell>
+                <TableCell>
+                  <span>@{item.user_tg_id}</span>
+                </TableCell>
                 <TableCell>
                   <StatusTag status={item.user_status} />
                 </TableCell>

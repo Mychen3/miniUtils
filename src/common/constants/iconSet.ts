@@ -16,6 +16,8 @@ const IconSet = {
   closeCircle: lazy(() => import('~icons/mdi/close-circle')),
   delete: lazy(() => import('~icons/mdi/delete')),
   refresh: lazy(() => import('~icons/mdi/refresh')),
+  bellOutline: lazy(() => import('~icons/mdi/bell-outline')),
+  userAddOutline: lazy(() => import('~icons/mdi/user-multiple-add-outline')),
 };
 
 type IconSetType = keyof typeof IconSet;

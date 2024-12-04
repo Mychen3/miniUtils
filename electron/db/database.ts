@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { createUserSql } from './sql';
+import { createUserSql, createRiskDictSql } from './sql';
 
 let db: Database.Database;
 
@@ -13,6 +13,7 @@ const initDb = (path: string) => {
   db = new Database(path, {});
   db.pragma('journal_mode = WAL');
   if (!checkIfTableExists('users')) db.exec(createUserSql);
+  if (!checkIfTableExists('risk_dict')) db.exec(createRiskDictSql);
 };
 
 const closeDb = () => db?.close();

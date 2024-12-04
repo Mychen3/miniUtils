@@ -1,8 +1,8 @@
 import { BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
-import { TelegramClient, sessions, Api, client } from 'telegram';
+import { TelegramClient, sessions, Api } from 'telegram';
 import { IpcKey } from '../ipc/ipcKey';
 import { passKey, TgErrorConst, tgLoginHandle } from '../../common/const';
-import { getUserById, insertUser, IUserItem, updateUserStatus } from '../db/module/user';
+import { getUserById, insertUser, updateUserStatus } from '../db/module/user';
 
 const apiId = Number(import.meta.env.VITE_TG_API_ID);
 const apiHash = import.meta.env.VITE_TG_API_HASH;
@@ -24,7 +24,7 @@ const saveUser = async (key: string, user: Api.User, status: keyof typeof passKe
 const disconnectAll = async () => {
   for (const client of clients.values()) {
     try {
-      await client.disconnect();
+      await client.destroy();
     } catch (error) {
       console.error('断开连接时出错:', error);
     }
@@ -55,7 +55,7 @@ const initClient = async (session: string) => {
     return client;
   } catch (error) {
     // 如果连接失败，确保断开连接并清理
-    await client.disconnect();
+    await client.destroy();
     throw error;
   }
 };
@@ -94,7 +94,7 @@ const refreshUserStatus = async (_event: IpcMainInvokeEvent, user_id: number) =>
     if (status !== userItem.user_status) await updateUserStatus(user_id, status);
     if (status === passKey.warn) {
       clients.delete(userItem.user_phone);
-      await client.disconnect();
+      await client?.destroy();
     }
     return true;
   } catch (error) {
@@ -113,7 +113,6 @@ const handleLogin = async (_event: IpcMainEvent, params: { username: string; pas
           ipcMain.once(IpcKey.confirmPhoneCode, (_event: IpcMainEvent, code: string) => resolve(code));
           win?.webContents.send(IpcKey.onTgLoginHandle, tgLoginHandle.verifyPhoneCode);
         });
-        console.log(result);
         return result;
       },
       password: params.password ? () => Promise.resolve(params.password) : undefined,
@@ -129,7 +128,7 @@ const handleLogin = async (_event: IpcMainEvent, params: { username: string; pas
     if (status === passKey.pass && user.phone) {
       clients.set(user.phone, client);
     } else {
-      await client.disconnect();
+      await client?.destroy();
     }
     win?.webContents.send(IpcKey.onTgLoginHandle, tgLoginHandle.loginEnd);
   } catch (error) {
@@ -163,4 +162,4 @@ const pullGroup = async () => {
   }
 };
 
-export { handleLogin, clients, refreshUserStatus };
+export { handleLogin, clients, refreshUserStatus, disconnectAll };

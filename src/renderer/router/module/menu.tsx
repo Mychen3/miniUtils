@@ -1,5 +1,6 @@
 import HomePage from '@pages/homePage/index';
-import Todo from '@pages/menu/todo';
+import RiskDict from '@pages/menu/riskDict';
+import Work from '@pages/menu/work';
 import type { IconSetType } from '@src/common/constants/iconSet';
 
 export type IMenuTypeItem = {
@@ -23,11 +24,19 @@ const routes: IMenuTypeItem[] = [
     },
   },
   {
-    path: 'todo',
-    element: <Todo />,
+    path: 'riskDict',
+    element: <RiskDict />,
     meta: {
-      title: '待办',
+      title: '风控',
       icon: 'todo',
+    },
+  },
+  {
+    path: 'work',
+    element: <Work />,
+    meta: {
+      title: '邀请',
+      icon: 'userAddOutline',
     },
   },
 ];

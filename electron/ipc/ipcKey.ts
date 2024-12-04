@@ -13,4 +13,7 @@ export enum IpcKey {
   getPageUsers = 'getPageUsers', // 获取分页用户
   deleteUser = 'deleteUser', // 删除用户
   refreshUserStatus = 'refreshUserStatus', // 刷新用户状态
+  addRiskDict = 'addRiskDict', // 添加风险字段
+  getRiskDictList = 'getRiskDictList', // 获取风险字段列表
+  deleteRiskDict = 'deleteRiskDict', // 删除风险字段
 }

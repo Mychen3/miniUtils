@@ -14,8 +14,9 @@ import {
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
 // import TimedQueue from './workr/TimedQueue.ts';
-import { handleLogin, refreshUserStatus } from './telegramCore';
+import { handleLogin, refreshUserStatus, disconnectAll } from './telegramCore';
 import { deleteUser, getPageUsers } from './db/module/user.ts';
+import { addRiskDict, getRiskDictList, deleteRiskDict } from './db/module/risk.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -68,6 +69,9 @@ function createWindow() {
     [IpcKey.getPageUsers, getPageUsers],
     [IpcKey.deleteUser, deleteUser],
     [IpcKey.refreshUserStatus, refreshUserStatus],
+    [IpcKey.addRiskDict, addRiskDict],
+    [IpcKey.getRiskDictList, getRiskDictList],
+    [IpcKey.deleteRiskDict, deleteRiskDict],
   ]);
   ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
   ipcMainHandMap.forEach((value, key) => ipcMain.handle(key, value));
@@ -90,6 +94,7 @@ app.on('quit', () => {
 });
 app.on('before-quit', () => {
   closeDb();
+  disconnectAll();
 });
 
 app.on('activate', () => {

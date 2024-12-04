@@ -11,7 +11,7 @@ const Layout = () => (
       <div className={styles.menu}>
         <div className={styles.logo}>
           <Icons name="logo" className="w-[40px] h-[40px] mr-[3px]"></Icons>
-          <span className={styles.logoText}>Mini-Util</span>
+          <span className={styles.logoText}>TG-Utils</span>
         </div>
         <Menu></Menu>
       </div>

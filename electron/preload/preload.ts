@@ -4,7 +4,7 @@ import { tgLoginHandle } from '../../common/const';
 import type { QueueItem } from '../workr/TimedQueue.ts';
 import type { TypeOptions } from 'react-toastify';
 import type { IUserItem } from '../db/module/user';
-
+import type { RiskDictItem } from '../db/module/risk';
 const electronAPI = {
   windowClose: () => ipcRenderer.send(IpcKey.close),
   windowHide: () => ipcRenderer.send(IpcKey.windowHide),
@@ -24,6 +24,9 @@ const electronAPI = {
     ipcRenderer.invoke(IpcKey.getPageUsers, params) as Promise<{ list: IUserItem[]; total: number }>,
   deleteUser: (userItem: IUserItem) => ipcRenderer.invoke(IpcKey.deleteUser, userItem),
   refreshUserStatus: (user_id: number) => ipcRenderer.invoke(IpcKey.refreshUserStatus, user_id),
+  addRiskDict: (params: { riskStatus: string; riskValue: string }) => ipcRenderer.invoke(IpcKey.addRiskDict, params),
+  getRiskDictList: () => ipcRenderer.invoke(IpcKey.getRiskDictList) as Promise<Array<RiskDictItem>>,
+  deleteRiskDict: (risk_id: number) => ipcRenderer.invoke(IpcKey.deleteRiskDict, { risk_id }),
 };
 
 export type IElectronAPI = typeof electronAPI;
