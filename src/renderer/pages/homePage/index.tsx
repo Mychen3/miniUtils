@@ -33,7 +33,7 @@ const HomePage = () => {
   const [list, setList] = useState<IUserItem[]>([]);
   const [total, setTotal] = useState(0);
 
-  const getlist = useMemoizedFn(async () => {
+  const getList = useMemoizedFn(async () => {
     setLoading(true);
     const res = await window.electronAPI.getPageUsers(params);
     setList([...res.list]);
@@ -43,17 +43,17 @@ const HomePage = () => {
 
   const deleteUser = async (userItem: IUserItem) => {
     await window.electronAPI.deleteUser(userItem);
-    getlist();
+    await getList();
   };
 
   const refreshUserStatus = async (user_id: number) => {
     setLoading(true);
     await window.electronAPI.refreshUserStatus(user_id);
-    getlist();
+    await getList();
   };
 
   useMount(async () => {
-    getlist();
+    await getList();
   });
 
   return (
@@ -159,7 +159,7 @@ const HomePage = () => {
           />
         </div>
       </div>
-      <Login refreshList={getlist} onClose={onClose} isOpen={isOpen} onOpenChange={onOpenChange} />
+      <Login refreshList={getList} onClose={onClose} isOpen={isOpen} onOpenChange={onOpenChange} />
     </div>
   );
 };

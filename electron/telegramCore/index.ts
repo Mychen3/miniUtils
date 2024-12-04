@@ -137,29 +137,29 @@ const handleLogin = async (_event: IpcMainEvent, params: { username: string; pas
   }
 };
 
-const pullGroup = async () => {
-  try {
-    // const entity = await client.getEntity('fyikbf1145');
-    // const list = await client.getDialogs();
-    // const dialog = list.find((item) => item.title === 'test');
-    // console.log(dialog);
-    // const result = await client.invoke(
-    //   new Api.messages.AddChatUser({
-    //     chatId: dialog?.id,
-    //     userId: '@RadomilMendoza',
-    //     fwdLimit: 10,
-    //   }),
-    // );
-    // const result = await client.invoke(
-    //   new Api.channels.InviteToChannel({
-    //     channel: '@fyikbf1145',
-    //     users: [],
-    //   }),
-    // );
-    // console.log(result);
-  } catch (error) {
-    console.log(error);
-  }
-};
+// const pullGroup = async () => {
+//   try {
+//     const entity = await client.getEntity('fyikbf1145');
+//     const list = await client.getDialogs();
+//     const dialog = list.find((item) => item.title === 'test');
+//     console.log(dialog);
+//     const result = await client.invoke(
+//       new Api.messages.AddChatUser({
+//         chatId: dialog?.id,
+//         userId: '@RadomilMendoza',
+//         fwdLimit: 10,
+//       }),
+//     );
+//     const result = await client.invoke(
+//       new Api.channels.InviteToChannel({
+//         channel: '@fyikbf1145',
+//         users: [],
+//       }),
+//     );
+//     console.log(result);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 export { handleLogin, clients, refreshUserStatus, disconnectAll };
