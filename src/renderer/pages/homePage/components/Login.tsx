@@ -96,7 +96,13 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
           )}
         </ModalContent>
       </Modal>
-      <Modal isOpen={isPhoneCodeOpen} onOpenChange={onPhoneCodeOpenChange} placement="top-center" backdrop="blur">
+      <Modal
+        isOpen={isPhoneCodeOpen}
+        isDismissable={false}
+        onOpenChange={onPhoneCodeOpenChange}
+        placement="top-center"
+        backdrop="blur"
+      >
         <ModalContent>
           {(onClose) => (
             <>

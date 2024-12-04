@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent, globalShortcut } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { IpcKey } from './ipc/ipcKey.ts';
@@ -17,6 +17,7 @@ import { createTray, destroyTray } from './tray';
 import { handleLogin, refreshUserStatus, disconnectAll } from './telegramCore';
 import { deleteUser, getPageUsers } from './db/module/user.ts';
 import { addRiskDict, getRiskDictList, deleteRiskDict } from './db/module/risk.ts';
+import { registerKeyboard } from './global/keyboard.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -97,6 +98,10 @@ app.on('before-quit', () => {
   disconnectAll();
 });
 
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+});
+
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
@@ -109,4 +114,5 @@ app.whenReady().then(() => {
   createTray(path.join(process.env.VITE_PUBLIC, 'logo.png'));
   createWindow();
   initDb(path.join(app.getPath('userData'), 'database.db'));
+  registerKeyboard();
 });
