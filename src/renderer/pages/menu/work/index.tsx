@@ -1,10 +1,25 @@
-import { Button, CardBody, Card, Slider, ScrollShadow, useDisclosure } from '@nextui-org/react';
+import {
+  Button,
+  CardBody,
+  Card,
+  Slider,
+  ScrollShadow,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+} from '@nextui-org/react';
 import styles from './css/index.module.scss';
 import Icons from '@src/renderer/components/Icons';
 import Statistics from './components/Statistics';
 import ImportModal from './components/ImportModal';
 import { useState } from 'react';
-
+import { applayUserStatus } from '@src/../common/const/index';
+import { useMount } from 'ahooks';
+import { toast, Bounce, TypeOptions } from 'react-toastify';
 const Work = () => {
   const [sliderValue, setSliderValue] = useState(80);
   const {
@@ -14,6 +29,9 @@ const Work = () => {
     onClose: onCloseImportModal,
   } = useDisclosure();
   const [userList, setUserList] = useState<string[]>([]);
+  const [serveStatus, setServeStatus] = useState(applayUserStatus.pullWait);
+  const [isGroupModal, setIsGroupModal] = useState(false);
+  const [groupUrl, setGroupUrl] = useState('');
   const [userCount, setUserCount] = useState({
     total: 0,
     success: 0,
@@ -33,6 +51,50 @@ const Work = () => {
     });
   };
 
+  useMount(() => {
+    window.electronAPI.onPullHandleMessage((_event, params) => {
+      console.log(params);
+    });
+  });
+
+  const isTelegramLink = (url: string) => {
+    const prefix = 'https://t.me/';
+    return url.startsWith(prefix);
+  };
+
+  const onToastMessage = (message: string, type: TypeOptions) => {
+    toast(message, {
+      type,
+      position: 'top-right',
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+      transition: Bounce,
+    });
+  };
+
+  const onStartInvite = async () => {
+    try {
+      if (serveStatus === applayUserStatus.pullWait) {
+        if (!isTelegramLink(groupUrl)) return onToastMessage('请输入正确的群组链接', 'error');
+        if (userList.length === 0) return onToastMessage('请导入账户', 'error');
+        const groupId = groupUrl.split('/').pop();
+        if (!groupId) return;
+        await window.electronAPI.inviteUser({ pullNames: userList.join(','), groupId });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onClickInviteUser = () => {
+    if (serveStatus === applayUserStatus.pullWait) return setIsGroupModal(true);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.search}>
@@ -44,7 +106,12 @@ const Work = () => {
         >
           导入账户
         </Button>
-        <Button color="danger" size="sm" endContent={<Icons name="stopwatchStartOutline" />}>
+        <Button
+          color="danger"
+          size="sm"
+          onClick={onClickInviteUser}
+          endContent={<Icons name="stopwatchStartOutline" />}
+        >
           执行
         </Button>
       </div>
@@ -80,6 +147,27 @@ const Work = () => {
         onOpenChange={onOpenChangeImportModal}
         onClose={onCloseImportModal}
       />
+      <Modal isOpen={isGroupModal} size="xl" isDismissable={false} onClose={() => setIsGroupModal(false)}>
+        <ModalContent>
+          <ModalHeader>导入账户</ModalHeader>
+          <ModalBody>
+            <Input
+              label="群组链接"
+              value={groupUrl}
+              onChange={(e) => setGroupUrl(e.target.value)}
+              placeholder="请输入群地址"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" variant="flat" onPress={() => setIsGroupModal(false)}>
+              取消
+            </Button>
+            <Button color="primary" onPress={onStartInvite}>
+              开始执行
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

@@ -14,7 +14,7 @@ import {
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
 // import TimedQueue from './workr/TimedQueue.ts';
-import { handleLogin, refreshUserStatus, disconnectAll } from './telegramCore';
+import { handleLogin, refreshUserStatus, pullGroup } from './telegramCore';
 import { deleteUser, getPageUsers } from './db/module/user.ts';
 import { addRiskDict, getRiskDictList, deleteRiskDict } from './db/module/risk.ts';
 import { registerKeyboard } from './global/keyboard.ts';
@@ -73,6 +73,7 @@ function createWindow() {
     [IpcKey.addRiskDict, addRiskDict],
     [IpcKey.getRiskDictList, getRiskDictList],
     [IpcKey.deleteRiskDict, deleteRiskDict],
+    [IpcKey.inviteUser, pullGroup],
   ]);
   ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
   ipcMainHandMap.forEach((value, key) => ipcMain.handle(key, value));
@@ -95,7 +96,6 @@ app.on('quit', () => {
 });
 app.on('before-quit', () => {
   closeDb();
-  disconnectAll();
 });
 
 app.on('will-quit', () => {

@@ -5,6 +5,8 @@ import type { QueueItem } from '../workr/TimedQueue.ts';
 import type { TypeOptions } from 'react-toastify';
 import type { IUserItem } from '../db/module/user';
 import type { RiskDictItem } from '../db/module/risk';
+import type { PullHandleMessage } from '../../common/const';
+
 const electronAPI = {
   windowClose: () => ipcRenderer.send(IpcKey.close),
   windowHide: () => ipcRenderer.send(IpcKey.windowHide),
@@ -16,8 +18,9 @@ const electronAPI = {
     ipcRenderer.on(IpcKey.onTimedQueueTask, callback),
   loginTg: (params: { username: string; password?: string }) => ipcRenderer.send(IpcKey.loginTg, params),
   confirmPhoneCode: (code: string) => ipcRenderer.send(IpcKey.confirmPhoneCode, code),
-  onTgLoginHandle: (callback: (event: IpcRendererEvent, handle: keyof typeof tgLoginHandle) => void) =>
-    ipcRenderer.on(IpcKey.onTgLoginHandle, callback),
+  onTgLoginHandle: (
+    callback: (event: IpcRendererEvent, handle: keyof typeof tgLoginHandle, errorMessage?: string) => void,
+  ) => ipcRenderer.on(IpcKey.onTgLoginHandle, callback),
   onToastMessage: (callback: (event: IpcRendererEvent, message: string, type: TypeOptions) => void) =>
     ipcRenderer.on(IpcKey.onToastMessage, callback),
   getPageUsers: (params: { page: number; pageSize: number; search: string }) =>
@@ -27,6 +30,9 @@ const electronAPI = {
   addRiskDict: (params: { riskStatus: string; riskValue: string }) => ipcRenderer.invoke(IpcKey.addRiskDict, params),
   getRiskDictList: () => ipcRenderer.invoke(IpcKey.getRiskDictList) as Promise<Array<RiskDictItem>>,
   deleteRiskDict: (risk_id: number) => ipcRenderer.invoke(IpcKey.deleteRiskDict, { risk_id }),
+  inviteUser: (params: { pullNames: string; groupId: string }) => ipcRenderer.invoke(IpcKey.inviteUser, params),
+  onPullHandleMessage: (callback: (event: IpcRendererEvent, params: PullHandleMessage) => void) =>
+    ipcRenderer.on(IpcKey.onPullHandleMessage, callback),
 };
 
 export type IElectronAPI = typeof electronAPI;

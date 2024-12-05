@@ -1,7 +1,6 @@
 import { insertUserSql } from '../sql';
 import { db } from '../database';
 import { IpcMainInvokeEvent } from 'electron';
-import { clients } from '../../telegramCore/index';
 
 interface InsertUserParams {
   userName: string;
@@ -81,7 +80,7 @@ const getPageUsers = async (
         if (isSession) return item;
         const { session_id: _, ...rest } = item as IUserItem;
         return rest;
-      }),
+      }) as IUserItem[],
       total: (totalResult as { total: number }).total,
     };
   } catch (error) {
@@ -91,14 +90,9 @@ const getPageUsers = async (
 
 const deleteUser = async (_event: IpcMainInvokeEvent, userItem: IUserItem) => {
   try {
-    const { user_id: userId, user_phone } = userItem;
+    const { user_id: userId } = userItem;
     const stmt = db.prepare(`DELETE FROM users WHERE user_id = ?`);
     await stmt.run(userId);
-    const client = clients.get(userItem.session_id);
-    if (client) {
-      client.destroy();
-      clients.delete(user_phone);
-    }
   } catch (error) {
     console.log(error);
   }

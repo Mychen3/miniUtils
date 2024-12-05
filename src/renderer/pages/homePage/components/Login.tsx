@@ -4,7 +4,7 @@ import { useDisclosure } from '@nextui-org/react';
 import Icons from '@src/renderer/components/Icons';
 import { useMount } from 'ahooks';
 import { tgLoginHandle } from '@src/../common/const/index';
-
+import { toast, Bounce } from 'react-toastify';
 type ILoginProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -34,7 +34,7 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
     });
 
   useMount(() => {
-    window.electronAPI.onTgLoginHandle(async (_event, handle) => {
+    window.electronAPI.onTgLoginHandle(async (_event, handle, errorMessage) => {
       if (handle === tgLoginHandle.verifyPhoneCode) {
         const phoneCode = await showModal();
         window.electronAPI.confirmPhoneCode(phoneCode as string);
@@ -46,6 +46,20 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
           password: '',
         });
         refreshList();
+      } else if (handle === tgLoginHandle.loginError) {
+        setLoginLoading(false);
+        toast(errorMessage, {
+          type: 'error',
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+          transition: Bounce,
+        });
       }
     });
   });

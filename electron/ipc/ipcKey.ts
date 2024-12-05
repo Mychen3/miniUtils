@@ -16,4 +16,6 @@ export enum IpcKey {
   addRiskDict = 'addRiskDict', // 添加风险字段
   getRiskDictList = 'getRiskDictList', // 获取风险字段列表
   deleteRiskDict = 'deleteRiskDict', // 删除风险字段
+  inviteUser = 'inviteUser', // 邀请用户
+  onPullHandleMessage = 'onPullHandleMessage', // 监听拉取群组消息
 }
