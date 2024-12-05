@@ -22,6 +22,11 @@ enum applayUserStatus {
   pullWait = 'pullWait', // 待拉取
 }
 
+
+const regex = {
+  isUserExist: /^No user has "([^"]+)" as username$/,
+};
+
 enum IErrorType {
   PHONE_CODE_INVALI = 'PHONE_CODE_INVALI',
   CHECK_USER_RISK = 'CHECK_USER_RISK',
@@ -30,10 +35,14 @@ enum IErrorType {
   PHONE_NUMBER_UNAVAILABLE = 'PHONE_NUMBER_UNAVAILABLE',
   USERNAME_INVALID = 'USERNAME_INVALID',
   CHAT_WRITE_FORBIDDEN = 'CHAT_WRITE_FORBIDDEN',
+  PHONE_CODE_INVALID = 'PHONE_CODE_INVALID',
+  INVITE_HASH_EXPIRED = 'INVITE_HASH_EXPIRED',
+  CHANNEL_PRIVATE = 'CHANNEL_PRIVATE',
+  PEER_FLOOD = 'PEER_FLOOD',
 }
 
 export type PullHandleMessage<T = any> = {
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'stop' | 'end';
   message: string;
   data?: T;
 };
@@ -46,6 +55,10 @@ const TgErrorConst: Record<IErrorType, string> = {
   [IErrorType.PHONE_NUMBER_UNAVAILABLE]: '电话号码无效',
   [IErrorType.USERNAME_INVALID]: '用户名无效',
   [IErrorType.CHAT_WRITE_FORBIDDEN]: '当前账号无法发送消息',
+  [IErrorType.PHONE_CODE_INVALID]: '验证码不正确，重新输入',
+  [IErrorType.INVITE_HASH_EXPIRED]: '邀请链接已过期',
+  [IErrorType.CHANNEL_PRIVATE]: '未加入此频道/超级组',
+  [IErrorType.PEER_FLOOD]: '请求过于频繁，请稍后再试',
 };
 
-export { systemKey, TgErrorConst, tgLoginHandle, passKey, applayUserStatus, IErrorType };
+export { systemKey, TgErrorConst, tgLoginHandle, passKey, applayUserStatus, IErrorType,regex };

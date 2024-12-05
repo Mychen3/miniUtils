@@ -45,6 +45,7 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
           username: '',
           password: '',
         });
+        setPhoneCode('');
         refreshList();
       } else if (handle === tgLoginHandle.loginError) {
         setLoginLoading(false);

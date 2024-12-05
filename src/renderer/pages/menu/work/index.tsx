@@ -3,7 +3,6 @@ import {
   CardBody,
   Card,
   Slider,
-  ScrollShadow,
   useDisclosure,
   Modal,
   ModalContent,
@@ -18,7 +17,7 @@ import Statistics from './components/Statistics';
 import ImportModal from './components/ImportModal';
 import { useState } from 'react';
 import { applayUserStatus } from '@src/../common/const/index';
-import { useMount } from 'ahooks';
+import { useMemoizedFn, useMount } from 'ahooks';
 import { toast, Bounce, TypeOptions } from 'react-toastify';
 const Work = () => {
   const [sliderValue, setSliderValue] = useState(80);
@@ -32,6 +31,7 @@ const Work = () => {
   const [serveStatus, setServeStatus] = useState(applayUserStatus.pullWait);
   const [isGroupModal, setIsGroupModal] = useState(false);
   const [groupUrl, setGroupUrl] = useState('');
+  const [msgList, setMsgList] = useState<string[]>([]);
   const [userCount, setUserCount] = useState({
     total: 0,
     success: 0,
@@ -51,10 +51,21 @@ const Work = () => {
     });
   };
 
-  useMount(() => {
+  const onPullHandleMessage = useMemoizedFn(() => {
     window.electronAPI.onPullHandleMessage((_event, params) => {
       console.log(params);
+
+      if (params.type === 'stop') setServeStatus(applayUserStatus.pullWait);
+      if (params.type === 'success') {
+      }
+      if (params.type === 'error') {
+      }
+      if (params.type === 'end') setServeStatus(applayUserStatus.pullWait);
     });
+  });
+
+  useMount(() => {
+    onPullHandleMessage();
   });
 
   const isTelegramLink = (url: string) => {
@@ -82,9 +93,10 @@ const Work = () => {
       if (serveStatus === applayUserStatus.pullWait) {
         if (!isTelegramLink(groupUrl)) return onToastMessage('请输入正确的群组链接', 'error');
         if (userList.length === 0) return onToastMessage('请导入账户', 'error');
-        const groupId = groupUrl.split('/').pop();
-        if (!groupId) return;
-        await window.electronAPI.inviteUser({ pullNames: userList.join(','), groupId });
+        if (!groupUrl) return;
+        await window.electronAPI.inviteUser({ pullNames: userList.join(','), groupId: groupUrl });
+        setServeStatus(applayUserStatus.pull);
+        setIsGroupModal(false);
       }
     } catch (error) {
       console.log(error);
@@ -92,6 +104,7 @@ const Work = () => {
   };
 
   const onClickInviteUser = () => {
+    if (serveStatus === applayUserStatus.pull) return;
     if (serveStatus === applayUserStatus.pullWait) return setIsGroupModal(true);
   };
 
@@ -107,6 +120,7 @@ const Work = () => {
           导入账户
         </Button>
         <Button
+          isLoading={serveStatus === applayUserStatus.pull}
           color="danger"
           size="sm"
           onClick={onClickInviteUser}
@@ -134,9 +148,13 @@ const Work = () => {
           <div className="my-[5px] text-default-600 font-[600]">记录：</div>
           <Card>
             <CardBody>
-              <ScrollShadow size={100} className="w-[calc(100%)] h-[calc(100vh-305px)]">
-                123
-              </ScrollShadow>
+              <div className="w-[calc(100%)] h-[calc(100vh-305px)] overflow-y-auto">
+                {msgList.map((item, index) => (
+                  <p key={index} className="text-default-600">
+                    {item}
+                  </p>
+                ))}
+              </div>
             </CardBody>
           </Card>
         </div>
