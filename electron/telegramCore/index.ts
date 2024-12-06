@@ -196,14 +196,15 @@ const startPull = async () => {
     const result = await client.invoke(
       new Api.channels.InviteToChannel({
         channel: pullInfo.groupHash,
-        users: removerNames.map((item) => item),
+        users: removerNames,
       }),
     );
 
     const users = (result.updates as { users: Api.User[] }).users;
     const updatesNames = users
-      .filter((item: Api.User) => item.phone === currentUser.user_phone) //除去当前账号
+      .filter((item: Api.User) => item.phone !== currentUser.user_phone) //除去当前账号
       .map((item: Api.User) => item.username); //获取当前账号邀请成功的用户
+
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'success',
       data: {
@@ -225,8 +226,7 @@ const startPull = async () => {
     await client?.destroy();
     nextPull();
   } catch (error) {
-    console.log(error);
-
+    const nextPulls = [IErrorType.CHAT_MEMBER_ADD_FAILED];
     await client?.destroy();
     const message = getErrorMessage(error);
     if ((error as { errorMessage: IErrorType }).errorMessage === IErrorType.USERNAME_INVALID) {
@@ -235,12 +235,21 @@ const startPull = async () => {
     }
     const match = message.match(regex.isUserExist);
     if (match) {
-      const name = `@${match?.[1]}`;
-      const names = removerNames.filter((item) => item !== name);
+      const name = `${match?.[1]}`;
+      const names = removerNames.filter((item) => item !== `@${name}`);
       pullInfo.currentPullNames = [...pullInfo.currentPullNames, ...names];
+
       pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
         type: 'error',
         message: `@${name}账号不存在`,
+      });
+      return nextPull();
+    }
+
+    if (nextPulls.includes((error as { errorMessage: IErrorType }).errorMessage)) {
+      pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+        type: 'error',
+        message: `错误，${message}，继续拉取`,
       });
       return nextPull();
     }

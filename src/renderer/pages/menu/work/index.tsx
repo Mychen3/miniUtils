@@ -73,8 +73,8 @@ const Work = () => {
         setMsgList((prev) => [
           ...prev,
           { type: 'info', msg: message },
-          { type: 'success', msg: `成功邀请${data.updates.join(',')}` },
-          { type: 'error', msg: `邀请失败${data.error.join(',')}` },
+          { type: 'success', msg: `成功邀请：${data.updates.join('、')}` },
+          { type: 'error', msg: `邀请失败：${data.error.join('、')}` },
         ]);
         handleCount(data);
       } else if (type === 'stop' || type === 'error') {

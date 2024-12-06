@@ -13,7 +13,7 @@ const ImportModal = ({ isOpen, onOpenChange, onClose, onClickImport }: IImportMo
 
   const setUserList: React.ChangeEventHandler<HTMLInputElement> = (e) => setValue(e.target.value);
   const onClickImportUser = () => {
-    onClickImport(value.split('\n'));
+    onClickImport(value.split('\n').filter((item) => item.trim()));
     onClearUserList();
   };
 

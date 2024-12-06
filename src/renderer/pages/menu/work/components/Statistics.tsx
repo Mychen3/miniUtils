@@ -28,7 +28,9 @@ const Statistics = ({ userCount }: { userCount: { total: number; success: number
           <div className="font-[600] text-[26px] text-default-100">等待</div>
           <Icons name="weatherTime" className="text-default-100 size-[28px]" />
         </div>
-        <span className="mt-[20px] text-[18px] text-default-100">{userCount.total - userCount.success}</span>
+        <span className="mt-[20px] text-[18px] text-default-100">
+          {userCount.total - userCount.success - userCount.error}
+        </span>
       </CardBody>
     </Card>
     <Card>

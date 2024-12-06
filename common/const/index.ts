@@ -39,6 +39,7 @@ enum IErrorType {
   CHANNEL_PRIVATE = 'CHANNEL_PRIVATE',
   PEER_FLOOD = 'PEER_FLOOD',
   USER_NOT_MUTUAL_CONTACT = 'USER_NOT_MUTUAL_CONTACT',
+  CHAT_MEMBER_ADD_FAILED = 'CHAT_MEMBER_ADD_FAILED',
 }
 
 export type PullHandleMessage<T = any> = {
@@ -60,6 +61,7 @@ const TgErrorConst: Record<IErrorType, string> = {
   [IErrorType.CHANNEL_PRIVATE]: '未加入此频道/超级组',
   [IErrorType.PEER_FLOOD]: '请求过于频繁，请稍后再试',
   [IErrorType.USER_NOT_MUTUAL_CONTACT]: '不是互相关注用户',
+  [IErrorType.CHAT_MEMBER_ADD_FAILED]: '加群失败',
 };
 
 export { systemKey, TgErrorConst, tgLoginHandle, passKey, applayUserStatus, IErrorType, regex };
