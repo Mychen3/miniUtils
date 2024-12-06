@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import { TelegramClient, sessions, Api } from 'telegram';
 import { IpcKey } from '../ipc/ipcKey';
-import { applayUserStatus, passKey, tgLoginHandle, IErrorType, regex } from '../../common/const';
+import { applayUserStatus, passKey, tgLoginHandle, IErrorType } from '../../common/const';
 import { getUserById, insertUser, updateUserStatus, getPageUsers, IUserItem } from '../db/module/user';
 import { getErrorMessage } from '../../common/util';
 import { getRiskDictList } from '../db/module/risk';
@@ -145,25 +145,28 @@ const handleSetUserIndex = () => {
 };
 
 const nextPull = () => {
+  if (pullInfo.currentPullNames.length === 0) {
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+      type: 'end',
+      message: '全部拉取完成',
+    });
+    return clearPullInfo();
+  }
+
   if (pullInfo.currentPullNames.length && pullInfo.pullStatus === applayUserStatus.pull) {
     //判断当前账号是第几位如果是最后一个就把下标改为1，如果不是最后一个就加1
     handleSetUserIndex();
     startPull();
-  } else {
-    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
-      type: 'end',
-      message: '拉取完成',
-    });
   }
 };
 
 const startPull = async () => {
-  let removerNames: string[] = [];
   let client: TelegramClient | null = null;
+  let pullName: string = '';
+  const currentUser = pullInfo.currentUser[pullInfo.currentUserIndex];
   try {
-    const currentUser = pullInfo.currentUser[pullInfo.currentUserIndex];
-    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, { type: 'info', message: '8秒后开始拉取！' });
-    await new Promise((resolve) => setTimeout(resolve, 8000));
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, { type: 'info', message: '10秒后开始拉取！' });
+    await new Promise((resolve) => setTimeout(resolve, 10000));
 
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'info',
@@ -191,74 +194,37 @@ const startPull = async () => {
     // TODO 加群需要优化
     // await client.invoke(new Api.messages.ImportChatInvite({ hash: groupHash }));
 
-    removerNames = pullInfo.currentPullNames.splice(-3);
-
-    const result = await client.invoke(
+    pullName = pullInfo.currentPullNames.pop()!;
+    await client.invoke(
       new Api.channels.InviteToChannel({
         channel: pullInfo.groupHash,
-        users: removerNames,
+        users: [pullName],
       }),
     );
-
-    const users = (result.updates as { users: Api.User[] }).users;
-    const updatesNames = users
-      .filter((item: Api.User) => item.phone !== currentUser.user_phone) //除去当前账号
-      .map((item: Api.User) => item.username); //获取当前账号邀请成功的用户
+    // const users = (result.updates as { users: Api.User[] }).users;
+    // console.log(result.updates);
 
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'success',
-      data: {
-        updates: updatesNames,
-        error: removerNames.filter((str) => !updatesNames.includes(str)), //获取当前账号邀请失败的用户
-      },
-      message: `邀请结果`,
+      message: `${pullName}邀请成功!`,
     });
-
-    if (pullInfo.currentPullNames.length === 0) {
-      pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
-        type: 'end',
-        message: '拉取完成',
-      });
-      await client?.destroy();
-      clearPullInfo();
-      return;
-    }
     await client?.destroy();
     nextPull();
   } catch (error) {
-    const nextPulls = [IErrorType.CHAT_MEMBER_ADD_FAILED];
+    console.log(error);
     await client?.destroy();
     const message = getErrorMessage(error);
-    if ((error as { errorMessage: IErrorType }).errorMessage === IErrorType.USERNAME_INVALID) {
-      //TODO 待看报错问题
-      return nextPull();
-    }
-    const match = message.match(regex.isUserExist);
-    if (match) {
-      const name = `${match?.[1]}`;
-      const names = removerNames.filter((item) => item !== `@${name}`);
-      pullInfo.currentPullNames = [...pullInfo.currentPullNames, ...names];
 
-      pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
-        type: 'error',
-        message: `@${name}账号不存在`,
-      });
-      return nextPull();
-    }
-
-    if (nextPulls.includes((error as { errorMessage: IErrorType }).errorMessage)) {
-      pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
-        type: 'error',
-        message: `错误，${message}，继续拉取`,
-      });
-      return nextPull();
+    if (message === IErrorType.PEER_FLOOD) {
+      pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_phone !== currentUser.user_phone);
     }
 
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
-      type: 'stop',
-      message: `停止拉取，${message}`,
+      type: 'error',
+      message: `错误，${message} 账号：${pullName}`,
     });
-    clearPullInfo();
+
+    nextPull();
   }
 };
 

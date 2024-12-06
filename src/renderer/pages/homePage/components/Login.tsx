@@ -16,6 +16,7 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
   const [inputParams, setInputParams] = useState({
     username: '',
     password: '',
+    areaCode: '',
   });
   const resolvePromise = useRef<((value: string) => void) | null>(null);
   const [phoneCode, setPhoneCode] = useState('');
@@ -24,7 +25,10 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
 
   const onLogin = () => {
     setLoginLoading(true);
-    window.electronAPI.loginTg(inputParams);
+    window.electronAPI.loginTg({
+      username: inputParams.areaCode + ' ' + inputParams.username,
+      password: inputParams.password,
+    });
   };
 
   const showModal = () =>
@@ -44,6 +48,7 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
         setInputParams({
           username: '',
           password: '',
+          areaCode: '',
         });
         setPhoneCode('');
         refreshList();
@@ -79,22 +84,32 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
             <>
               <ModalHeader className="flex flex-col gap-1">添加账号</ModalHeader>
               <ModalBody>
-                <Input
-                  endContent={
-                    <Icons name="user" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                  }
-                  value={inputParams.username}
-                  onChange={(e) => setInputParams({ ...inputParams, username: e.target.value })}
-                  label="用户名"
-                  variant="bordered"
-                />
+                <div className="flex gap-[5px]">
+                  <Input
+                    startContent={'+'}
+                    className="w-[100px]"
+                    value={inputParams.areaCode}
+                    onChange={(e) => setInputParams({ ...inputParams, areaCode: e.target.value })}
+                    variant="bordered"
+                    size="lg"
+                  />
+                  <Input
+                    endContent={
+                      <Icons name="user" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                    }
+                    value={inputParams.username}
+                    onChange={(e) => setInputParams({ ...inputParams, username: e.target.value })}
+                    variant="bordered"
+                    size="lg"
+                  />
+                </div>
                 <Input
                   endContent={
                     <Icons name="password" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                   }
                   value={inputParams.password}
                   onChange={(e) => setInputParams({ ...inputParams, password: e.target.value })}
-                  label="密码"
+                  label="二次密码"
                   type="password"
                   variant="bordered"
                 />

@@ -40,12 +40,13 @@ enum IErrorType {
   PEER_FLOOD = 'PEER_FLOOD',
   USER_NOT_MUTUAL_CONTACT = 'USER_NOT_MUTUAL_CONTACT',
   CHAT_MEMBER_ADD_FAILED = 'CHAT_MEMBER_ADD_FAILED',
+  PHONE_NUMBER_INVALID = 'PHONE_NUMBER_INVALID',
+  CHAT_INVALID = 'CHAT_INVALID',
 }
 
-export type PullHandleMessage<T = any> = {
+export type PullHandleMessage = {
   type: 'success' | 'error' | 'info' | 'stop' | 'end';
   message: string;
-  data?: T;
 };
 
 const TgErrorConst: Record<IErrorType, string> = {
@@ -62,6 +63,8 @@ const TgErrorConst: Record<IErrorType, string> = {
   [IErrorType.PEER_FLOOD]: '请求过于频繁，请稍后再试',
   [IErrorType.USER_NOT_MUTUAL_CONTACT]: '不是互相关注用户',
   [IErrorType.CHAT_MEMBER_ADD_FAILED]: '加群失败',
+  [IErrorType.PHONE_NUMBER_INVALID]: '电话号码无效',
+  [IErrorType.CHAT_INVALID]: '邀请失败！',
 };
 
 export { systemKey, TgErrorConst, tgLoginHandle, passKey, applayUserStatus, IErrorType, regex };

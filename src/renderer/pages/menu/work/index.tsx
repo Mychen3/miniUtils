@@ -16,7 +16,7 @@ import Icons from '@src/renderer/components/Icons';
 import Statistics from './components/Statistics';
 import ImportModal from './components/ImportModal';
 import { useMemo, useState } from 'react';
-import { applayUserStatus } from '@src/../common/const/index';
+import { applayUserStatus, PullHandleMessage } from '@src/../common/const/index';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { toast, Bounce, TypeOptions } from 'react-toastify';
 const Work = () => {
@@ -30,7 +30,7 @@ const Work = () => {
   const [serveStatus, setServeStatus] = useState(applayUserStatus.pullWait);
   const [isGroupModal, setIsGroupModal] = useState(false);
   const [groupUrl, setGroupUrl] = useState('');
-  const [msgList, setMsgList] = useState<{ msg: string; type: string }[]>([]);
+  const [msgList, setMsgList] = useState<PullHandleMessage[]>([]);
   const [userCount, setUserCount] = useState({
     total: 0,
     success: 0,
@@ -55,33 +55,19 @@ const Work = () => {
     });
   };
 
-  const handleCount = useMemoizedFn((data: { error: Array<string>; updates: Array<string> }) => {
-    setUserCount((prev) => ({
-      ...prev,
-      success: prev.success + data.updates.length,
-      error: prev.error + data.error.length,
-    }));
-  });
-
   const onPullHandleMessage = useMemoizedFn(() => {
     window.electronAPI.onPullHandleMessage((_event, params) => {
-      const { type, message, data } = params;
-      if (type === 'info' || type === 'end') {
-        setMsgList((prev) => [...prev, { msg: message, type: 'info' }]);
-        if (type === 'end') setServeStatus(applayUserStatus.pullWait);
-      } else if (type === 'success') {
-        setMsgList((prev) => [
+      if (['end', 'stop'].includes(params.type)) setServeStatus(applayUserStatus.pullWait);
+      if (['error', 'success'].includes(params.type)) {
+        setUserCount((prev) => ({
           ...prev,
-          { type: 'info', msg: message },
-          { type: 'success', msg: `成功邀请：${data.updates.join('、')}` },
-          { type: 'error', msg: `邀请失败：${data.error.join('、')}` },
-        ]);
-        handleCount(data);
-      } else if (type === 'stop' || type === 'error') {
-        setMsgList((prev) => [...prev, { type: 'error', msg: message }]);
-        if (type === 'stop') setServeStatus(applayUserStatus.pullWait);
+          error: params.type === 'error' ? prev.error + 1 : prev.error,
+          success: params.type === 'success' ? prev.success + 1 : prev.success,
+        }));
       }
+      setMsgList((prev) => [...prev, params]);
     });
+
   });
 
   useMount(() => {
@@ -178,7 +164,7 @@ const Work = () => {
               <div className="w-[calc(100%)] h-[calc(100vh-305px)] overflow-y-auto">
                 {msgList.map((item, index) => (
                   <p key={index} className={getMsgColor(item.type)}>
-                    {item.msg}
+                    {item.message}
                   </p>
                 ))}
               </div>
