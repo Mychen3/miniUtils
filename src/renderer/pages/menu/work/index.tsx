@@ -15,12 +15,11 @@ import styles from './css/index.module.scss';
 import Icons from '@src/renderer/components/Icons';
 import Statistics from './components/Statistics';
 import ImportModal from './components/ImportModal';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { applayUserStatus } from '@src/../common/const/index';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { toast, Bounce, TypeOptions } from 'react-toastify';
 const Work = () => {
-  const [sliderValue, setSliderValue] = useState(80);
   const {
     isOpen: isImportModal,
     onOpen: onOpenImportModal,
@@ -31,12 +30,17 @@ const Work = () => {
   const [serveStatus, setServeStatus] = useState(applayUserStatus.pullWait);
   const [isGroupModal, setIsGroupModal] = useState(false);
   const [groupUrl, setGroupUrl] = useState('');
-  const [msgList, setMsgList] = useState<string[]>([]);
+  const [msgList, setMsgList] = useState<{ msg: string; type: string }[]>([]);
   const [userCount, setUserCount] = useState({
     total: 0,
     success: 0,
     error: 0,
   });
+
+  const sliderValue = useMemo(
+    () => (userCount.total === 0 ? 0 : (userCount.success / userCount.total) * 100),
+    [userCount],
+  );
 
   const onClickOpenImportModal = () => {
     onOpenImportModal();
@@ -51,16 +55,32 @@ const Work = () => {
     });
   };
 
+  const handleCount = useMemoizedFn((data: { error: Array<string>; updates: Array<string> }) => {
+    setUserCount((prev) => ({
+      ...prev,
+      success: prev.success + data.updates.length,
+      error: prev.error + data.error.length,
+    }));
+  });
+
   const onPullHandleMessage = useMemoizedFn(() => {
     window.electronAPI.onPullHandleMessage((_event, params) => {
-      console.log(params);
-
-      if (params.type === 'stop') setServeStatus(applayUserStatus.pullWait);
-      if (params.type === 'success') {
+      const { type, message, data } = params;
+      if (type === 'info' || type === 'end') {
+        setMsgList((prev) => [...prev, { msg: message, type: 'info' }]);
+        if (type === 'end') setServeStatus(applayUserStatus.pullWait);
+      } else if (type === 'success') {
+        setMsgList((prev) => [
+          ...prev,
+          { type: 'info', msg: message },
+          { type: 'success', msg: `成功邀请${data.updates.join(',')}` },
+          { type: 'error', msg: `邀请失败${data.error.join(',')}` },
+        ]);
+        handleCount(data);
+      } else if (type === 'stop' || type === 'error') {
+        setMsgList((prev) => [...prev, { type: 'error', msg: message }]);
+        if (type === 'stop') setServeStatus(applayUserStatus.pullWait);
       }
-      if (params.type === 'error') {
-      }
-      if (params.type === 'end') setServeStatus(applayUserStatus.pullWait);
     });
   });
 
@@ -108,6 +128,13 @@ const Work = () => {
     if (serveStatus === applayUserStatus.pullWait) return setIsGroupModal(true);
   };
 
+  const getMsgColor = useMemoizedFn((type: string) => {
+    if (type === 'info') return 'text-default-600';
+    if (type === 'success') return 'text-success';
+    if (type === 'error') return 'text-danger';
+    return '';
+  });
+
   return (
     <div className={styles.container}>
       <div className={styles.search}>
@@ -150,8 +177,8 @@ const Work = () => {
             <CardBody>
               <div className="w-[calc(100%)] h-[calc(100vh-305px)] overflow-y-auto">
                 {msgList.map((item, index) => (
-                  <p key={index} className="text-default-600">
-                    {item}
+                  <p key={index} className={getMsgColor(item.type)}>
+                    {item.msg}
                   </p>
                 ))}
               </div>

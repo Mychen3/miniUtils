@@ -13,8 +13,9 @@ const pullInfo = {
   currentUserIndex: 0,
   currentPullNames: [] as string[],
   currentUser: [] as IUserItem[],
-  groupId: '',
+  groupHash: '',
   pullStatus: applayUserStatus.pullWait,
+  currentWin: null as BrowserWindow | null,
 };
 
 const saveUser = async (key: string, user: Api.User, status: keyof typeof passKey) => {
@@ -32,6 +33,8 @@ const clearPullInfo = () => {
   pullInfo.currentPullNames = [];
   pullInfo.currentUser = [];
   pullInfo.pullStatus = applayUserStatus.pullWait;
+  pullInfo.currentWin = null;
+  pullInfo.groupHash = '';
 };
 
 const initClient = async (session: string) => {
@@ -141,117 +144,130 @@ const handleSetUserIndex = () => {
     pullInfo.currentUserIndex === pullInfo.currentUser.length - 1 ? 0 : pullInfo.currentUserIndex + 1;
 };
 
-const startPull = async (_event: IpcMainEvent | IpcMainInvokeEvent, clientInstance: TelegramClient | null) => {
-  const win = BrowserWindow.fromWebContents(_event?.sender);
-  let client: TelegramClient | null = clientInstance;
-  let removerNames: string[] = [];
-  const groupHash = pullInfo.groupId.split('/').pop();
-  try {
-    if (pullInfo.currentPullNames.length === 0) {
-      await client?.destroy();
-      clearPullInfo();
-      win?.webContents.send(IpcKey.onPullHandleMessage, {
-        type: 'end',
-        message: '拉取完成',
-      });
-    }
-    while (pullInfo.currentPullNames.length && pullInfo.pullStatus === applayUserStatus.pull) {
-      const currentUser = pullInfo.currentUser[pullInfo.currentUserIndex];
-      if (!client) {
-        win?.webContents.send(IpcKey.onPullHandleMessage, { type: 'info', message: '10秒后开始拉取！' });
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-        //当前邀请到第几个账号（邀请的账号，不是被邀账号）
-        win?.webContents.send(IpcKey.onPullHandleMessage, {
-          type: 'info',
-          message: `正在连接账号+${currentUser.user_phone}`,
-        });
-        client = await initClient(currentUser.session_id);
-      }
-      if (!client) {
-        pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_id !== currentUser.user_id);
-        continue;
-      }
-      //验证账号风控
-      const status = await checkUserRisk(client);
-      if (status === passKey.warn) {
-        pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_id !== currentUser.user_id);
-        await client?.destroy();
-        await updateUserStatus(currentUser.user_id, passKey.warn);
-        win?.webContents.send(IpcKey.onPullHandleMessage, {
-          type: 'error',
-          message: `+${currentUser.user_phone},账号风控警告`,
-        });
-        //判断当前账号是第几位如果是最后一个就把下标改为1，如果不是最后一个就加1
-        handleSetUserIndex();
-        continue;
-      }
-      // TODO 加群需要优化
-      // await client.invoke(new Api.messages.ImportChatInvite({ hash: groupHash }));
-      removerNames = pullInfo.currentPullNames.splice(-2);
-      // 邀请
-      const result = await client.invoke(
-        new Api.channels.InviteToChannel({
-          channel: groupHash,
-          users: removerNames.map((item) => item),
-        }),
-      );
-      win?.webContents.send(IpcKey.onPullHandleMessage, {
-        type: 'success',
-        data: result.updates,
-        message: `邀请结果`,
-      });
-
-      //判断当前账号是第几位如果是最后一个就把下标改为1，如果不是最后一个就加1
-      handleSetUserIndex();
-      if (pullInfo.currentPullNames.length === 0) {
-        await client?.destroy();
-        clearPullInfo();
-        win?.webContents.send(IpcKey.onPullHandleMessage, {
-          type: 'end',
-          message: '拉取完成',
-        });
-      }
-      client = null;
-    }
-  } catch (error) {
-    console.log(error);
-    const message = getErrorMessage(error);
-    if ((error as { errorMessage: IErrorType }).errorMessage === IErrorType.USERNAME_INVALID)
-      return startPull(_event, client);
-    const match = message.match(regex.isUserExist);
-    if (match) {
-      const name = `@${match?.[1]}`;
-      const names = [...removerNames, ...pullInfo.currentPullNames];
-      pullInfo.currentPullNames = names.filter((item) => item !== name);
-      win?.webContents.send(IpcKey.onToastMessage, `@${name}账号不存在，重新拉取`, 'error');
-      startPull(_event, client);
-      return;
-    }
-
-    await client?.destroy();
-    clearPullInfo();
-    win?.webContents.send(IpcKey.onToastMessage, message, 'error');
-    win?.webContents.send(IpcKey.onPullHandleMessage, {
-      type: 'stop',
+const nextPull = () => {
+  if (pullInfo.currentPullNames.length && pullInfo.pullStatus === applayUserStatus.pull) {
+    //判断当前账号是第几位如果是最后一个就把下标改为1，如果不是最后一个就加1
+    handleSetUserIndex();
+    startPull();
+  } else {
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+      type: 'end',
+      message: '拉取完成',
     });
   }
 };
 
+const startPull = async () => {
+  let removerNames: string[] = [];
+  let client: TelegramClient | null = null;
+  try {
+    const currentUser = pullInfo.currentUser[pullInfo.currentUserIndex];
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, { type: 'info', message: '8秒后开始拉取！' });
+    await new Promise((resolve) => setTimeout(resolve, 8000));
+
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+      type: 'info',
+      message: `正在连接账号+${currentUser.user_phone}`,
+    });
+    client = await initClient(currentUser.session_id);
+
+    if (!client) {
+      pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_phone !== currentUser.user_phone);
+      return nextPull();
+    }
+    //验证账号风控
+    const status = await checkUserRisk(client);
+
+    if (status === passKey.warn) {
+      pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_phone !== currentUser.user_phone);
+      await client?.destroy();
+      await updateUserStatus(currentUser.user_id, passKey.warn);
+      pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+        type: 'error',
+        message: `+${currentUser.user_phone},账号风控警告`,
+      });
+      return nextPull();
+    }
+    // TODO 加群需要优化
+    // await client.invoke(new Api.messages.ImportChatInvite({ hash: groupHash }));
+
+    removerNames = pullInfo.currentPullNames.splice(-3);
+
+    const result = await client.invoke(
+      new Api.channels.InviteToChannel({
+        channel: pullInfo.groupHash,
+        users: removerNames.map((item) => item),
+      }),
+    );
+
+    const users = (result.updates as { users: Api.User[] }).users;
+    const updatesNames = users
+      .filter((item: Api.User) => item.phone === currentUser.user_phone) //除去当前账号
+      .map((item: Api.User) => item.username); //获取当前账号邀请成功的用户
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+      type: 'success',
+      data: {
+        updates: updatesNames,
+        error: removerNames.filter((str) => !updatesNames.includes(str)), //获取当前账号邀请失败的用户
+      },
+      message: `邀请结果`,
+    });
+
+    if (pullInfo.currentPullNames.length === 0) {
+      pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+        type: 'end',
+        message: '拉取完成',
+      });
+      await client?.destroy();
+      clearPullInfo();
+      return;
+    }
+    await client?.destroy();
+    nextPull();
+  } catch (error) {
+    console.log(error);
+
+    await client?.destroy();
+    const message = getErrorMessage(error);
+    if ((error as { errorMessage: IErrorType }).errorMessage === IErrorType.USERNAME_INVALID) {
+      //TODO 待看报错问题
+      return nextPull();
+    }
+    const match = message.match(regex.isUserExist);
+    if (match) {
+      const name = `@${match?.[1]}`;
+      const names = removerNames.filter((item) => item !== name);
+      pullInfo.currentPullNames = [...pullInfo.currentPullNames, ...names];
+      pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+        type: 'error',
+        message: `@${name}账号不存在`,
+      });
+      return nextPull();
+    }
+
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+      type: 'stop',
+      message: `停止拉取，${message}`,
+    });
+    clearPullInfo();
+  }
+};
+
 const pullGroup = async (_event: IpcMainInvokeEvent, params: { pullNames: string; groupId: string }) => {
+  pullInfo.currentWin = BrowserWindow.fromWebContents(_event.sender);
   return new Promise(async (resolve, reject) => {
     if (pullInfo.pullStatus === applayUserStatus.pull) return reject('当前正在拉取中');
     const userList = await getPageUsers(_event, { userStatus: passKey.pass, isSession: true });
     if (!userList || userList?.list.length === 0) return reject('没有可使用的账号');
-    const pullNames = params.pullNames.split(',');
     if (pullInfo.pullStatus === applayUserStatus.pullWait) {
       pullInfo.currentUser = userList.list as IUserItem[];
-      pullInfo.currentPullNames = pullNames;
+      pullInfo.currentPullNames = params.pullNames.split(',');
+      pullInfo.groupHash = params.groupId.split('/').pop() as string;
       // 开始拉取
       pullInfo.pullStatus = applayUserStatus.pull;
-      pullInfo.groupId = params.groupId;
     }
     resolve(true);
-    startPull(_event, null);
+    startPull();
   });
 };
 
