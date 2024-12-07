@@ -24,6 +24,7 @@ const IconSet = {
   accountSuccessOutline: lazy(() => import('~icons/mdi/account-success-outline')),
   weatherTime: lazy(() => import('~icons/mdi/weather-time')),
   errorOutline: lazy(() => import('~icons/mdi/error-outline')),
+  cellphone: lazy(() => import('~icons/mdi/cellphone')),
 };
 
 type IconSetType = keyof typeof IconSet;

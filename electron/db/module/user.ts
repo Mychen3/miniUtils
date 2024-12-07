@@ -35,7 +35,7 @@ const getUserById = (user_id: number) => {
   return stmt.get(user_id) as IUserItem;
 };
 
-const updateUserStatus = (user_id: number, user_status: string) => {
+const updateUserStatus = async (user_id: number, user_status: string) => {
   const stmt = db.prepare(`UPDATE users SET user_status = ? WHERE user_id = ?`);
   stmt.run(user_status, user_id);
 };

@@ -13,7 +13,6 @@ import {
 } from './ipc/mainIpc.ts';
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
-// import TimedQueue from './workr/TimedQueue.ts';
 import { handleLogin, refreshUserStatus, pullGroup } from './telegramCore';
 import { deleteUser, getPageUsers } from './db/module/user.ts';
 import { addRiskDict, getRiskDictList, deleteRiskDict } from './db/module/risk.ts';

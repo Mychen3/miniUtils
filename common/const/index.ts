@@ -42,6 +42,7 @@ enum IErrorType {
   CHAT_MEMBER_ADD_FAILED = 'CHAT_MEMBER_ADD_FAILED',
   PHONE_NUMBER_INVALID = 'PHONE_NUMBER_INVALID',
   CHAT_INVALID = 'CHAT_INVALID',
+  USER_ALREADY_PARTICIPANT = 'USER_ALREADY_PARTICIPANT',
 }
 
 export type PullHandleMessage = {
@@ -62,9 +63,10 @@ const TgErrorConst: Record<IErrorType, string> = {
   [IErrorType.CHANNEL_PRIVATE]: '未加入此频道/超级组',
   [IErrorType.PEER_FLOOD]: '请求过于频繁，请稍后再试',
   [IErrorType.USER_NOT_MUTUAL_CONTACT]: '不是互相关注用户',
-  [IErrorType.CHAT_MEMBER_ADD_FAILED]: '加群失败',
+  [IErrorType.CHAT_MEMBER_ADD_FAILED]: '邀请失败，用户隐私设置',
   [IErrorType.PHONE_NUMBER_INVALID]: '电话号码无效',
   [IErrorType.CHAT_INVALID]: '邀请失败！',
+  [IErrorType.USER_ALREADY_PARTICIPANT]: '用户已经是群成员',
 };
 
 export { systemKey, TgErrorConst, tgLoginHandle, passKey, applayUserStatus, IErrorType, regex };

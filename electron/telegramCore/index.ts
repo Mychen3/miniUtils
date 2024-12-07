@@ -3,7 +3,7 @@ import { TelegramClient, sessions, Api } from 'telegram';
 import { IpcKey } from '../ipc/ipcKey';
 import { applayUserStatus, passKey, tgLoginHandle, IErrorType } from '../../common/const';
 import { getUserById, insertUser, updateUserStatus, getPageUsers, IUserItem } from '../db/module/user';
-import { getErrorMessage } from '../../common/util';
+import { getErrorMessage, getErrorTypeMessage } from '../../common/util';
 import { getRiskDictList } from '../db/module/risk';
 
 const apiId = Number(import.meta.env.VITE_TG_API_ID);
@@ -160,6 +160,10 @@ const nextPull = () => {
   }
 };
 
+const filterUser = (userPhone: string) => {
+  pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_phone !== userPhone);
+};
+
 const startPull = async () => {
   let client: TelegramClient | null = null;
   let pullName: string = '';
@@ -175,14 +179,14 @@ const startPull = async () => {
     client = await initClient(currentUser.session_id);
 
     if (!client) {
-      pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_phone !== currentUser.user_phone);
+      filterUser(currentUser.user_phone);
       return nextPull();
     }
     //验证账号风控
     const status = await checkUserRisk(client);
 
     if (status === passKey.warn) {
-      pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_phone !== currentUser.user_phone);
+      filterUser(currentUser.user_phone);
       await client?.destroy();
       await updateUserStatus(currentUser.user_id, passKey.warn);
       pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
@@ -192,7 +196,8 @@ const startPull = async () => {
       return nextPull();
     }
     // TODO 加群需要优化
-    // await client.invoke(new Api.messages.ImportChatInvite({ hash: groupHash }));
+    const isAddGroup = await addGroup(client, pullInfo.groupHash);
+    if (!isAddGroup) return nextPull();
 
     pullName = pullInfo.currentPullNames.pop()!;
     await client.invoke(
@@ -201,9 +206,6 @@ const startPull = async () => {
         users: [pullName],
       }),
     );
-    // const users = (result.updates as { users: Api.User[] }).users;
-    // console.log(result.updates);
-
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'success',
       message: `${pullName}邀请成功!`,
@@ -213,17 +215,13 @@ const startPull = async () => {
   } catch (error) {
     console.log(error);
     await client?.destroy();
+
+    if (getErrorTypeMessage(error) === IErrorType.PEER_FLOOD) filterUser(currentUser.user_phone);
     const message = getErrorMessage(error);
-
-    if (message === IErrorType.PEER_FLOOD) {
-      pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_phone !== currentUser.user_phone);
-    }
-
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'error',
-      message: `错误，${message} 账号：${pullName}`,
+      message: `错误：${message} 账号：${pullName}`,
     });
-
     nextPull();
   }
 };
@@ -246,4 +244,19 @@ const pullGroup = async (_event: IpcMainInvokeEvent, params: { pullNames: string
   });
 };
 
-export { handleLogin, refreshUserStatus, pullGroup };
+const addGroup = async (client: TelegramClient, groupId: string) => {
+  try {
+    await client?.invoke(new Api.channels.JoinChannel({ channel: groupId }));
+    return true;
+  } catch (error) {
+    if (getErrorTypeMessage(error) === IErrorType.USER_ALREADY_PARTICIPANT) return true;
+    const message = getErrorMessage(error);
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+      type: 'error',
+      message: `加群失败：${message}`,
+    });
+    return false;
+  }
+};
+
+export { handleLogin, refreshUserStatus, pullGroup, addGroup };

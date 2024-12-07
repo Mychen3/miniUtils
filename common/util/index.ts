@@ -4,7 +4,9 @@ const getErrorMessage = (error: unknown) => {
   const errorMessage =
     (error as { errorMessage: IErrorType }).errorMessage ?? (error as { message: IErrorType }).message;
   const message = TgErrorConst[errorMessage];
-  return message ? message : errorMessage;
+  return message ?? errorMessage;
 };
 
-export { getErrorMessage };
+const getErrorTypeMessage = (error: unknown) => (error as { errorMessage: IErrorType }).errorMessage;
+
+export { getErrorMessage, getErrorTypeMessage };

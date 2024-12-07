@@ -95,7 +95,7 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
                   />
                   <Input
                     endContent={
-                      <Icons name="user" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                      <Icons name="cellphone" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                     }
                     value={inputParams.username}
                     onChange={(e) => setInputParams({ ...inputParams, username: e.target.value })}
