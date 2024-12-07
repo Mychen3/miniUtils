@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import { TelegramClient, sessions, Api } from 'telegram';
 import { IpcKey } from '../ipc/ipcKey';
-import { applayUserStatus, passKey, tgLoginHandle, IErrorType } from '../../common/const';
+import { applayUserStatus, passKey, tgLoginHandle, IErrorType, regex } from '../../common/const';
 import { getUserById, insertUser, updateUserStatus, getPageUsers, IUserItem } from '../db/module/user';
 import { getErrorMessage, getErrorTypeMessage } from '../../common/util';
 import { getRiskDictList } from '../db/module/risk';
@@ -167,6 +167,13 @@ const filterUser = (userPhone: string) => {
   pullInfo.currentUserIndex = pullInfo.currentUserIndex === 0 ? 0 : pullInfo.currentUserIndex - 1;
 };
 
+const formatError = (error: unknown) => {
+  const message = getErrorMessage(error);
+  const match = regex.isUserExist.exec(message);
+  if (match) return `用户不存在：${match[1]}`;
+  return message;
+};
+
 const startPull = async () => {
   let client: TelegramClient | null = null;
   let pullName: string = '';
@@ -223,7 +230,7 @@ const startPull = async () => {
     const isAccountError = accountError.includes(errorType);
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'error',
-      message: `错误：${getErrorMessage(error)} 账号：${isAccountError ? `+${currentUser.user_phone}` : pullName}`,
+      message: `错误：${formatError(error)} 账号：${isAccountError ? `+${currentUser.user_phone}` : pullName}`,
     });
     // 账号频繁就过滤拉人账号
     if (errorType === IErrorType.PEER_FLOOD) filterUser(currentUser.user_phone);
