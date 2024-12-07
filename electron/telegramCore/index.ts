@@ -214,15 +214,16 @@ const startPull = async () => {
     await client?.destroy();
     nextPull();
   } catch (error) {
-    console.log(error);
     await client?.destroy();
-
-    if (getErrorTypeMessage(error) === IErrorType.PEER_FLOOD) filterUser(currentUser.user_phone);
-    const message = getErrorMessage(error);
+    const accountError = [IErrorType.PEER_FLOOD]; // 账号错误的list
+    const errorType = getErrorTypeMessage(error);
+    const isAccountError = accountError.includes(errorType);
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'error',
-      message: `错误：${message} 账号：${pullName}`,
+      message: `错误：${getErrorMessage(error)} 账号：${isAccountError ? currentUser.user_phone : pullName}`,
     });
+    // 账号频繁就过滤拉人账号
+    if (errorType === IErrorType.PEER_FLOOD) filterUser(currentUser.user_phone);
     nextPull();
   }
 };
