@@ -117,6 +117,7 @@ const Work = () => {
     if (type === 'info') return 'text-default-600';
     if (type === 'success') return 'text-success';
     if (type === 'error') return 'text-danger';
+    if (type === 'end') return 'text-purple-500';
     return '';
   });
 

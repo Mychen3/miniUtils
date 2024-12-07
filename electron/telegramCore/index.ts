@@ -145,16 +145,18 @@ const handleSetUserIndex = () => {
 };
 
 const nextPull = () => {
-  if (pullInfo.currentPullNames.length === 0) {
+  if (pullInfo.currentUser.length === 0 || pullInfo.currentPullNames.length === 0) {
+    const message = pullInfo.currentUser.length === 0 ? '没有可使用的账号继续拉取了！' : '全部拉取完成！';
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'end',
-      message: '全部拉取完成',
+      message,
     });
-    return clearPullInfo();
+    clearPullInfo();
+    return; // 直接返回
   }
 
-  if (pullInfo.currentPullNames.length && pullInfo.pullStatus === applayUserStatus.pull) {
-    //判断当前账号是第几位如果是最后一个就把下标改为1，如果不是最后一个就加1
+  if (pullInfo.pullStatus === applayUserStatus.pull) {
+    // 判断当前账号是第几位如果是最后一个就把下标改为1，如果不是最后一个就加1
     handleSetUserIndex();
     startPull();
   }
@@ -169,6 +171,7 @@ const startPull = async () => {
   let client: TelegramClient | null = null;
   let pullName: string = '';
   const currentUser = pullInfo.currentUser[pullInfo.currentUserIndex];
+  console.log(pullInfo.currentUser);
   try {
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, { type: 'info', message: '10秒后开始拉取！' });
     await new Promise((resolve) => setTimeout(resolve, 10000));
@@ -220,7 +223,7 @@ const startPull = async () => {
     const isAccountError = accountError.includes(errorType);
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'error',
-      message: `错误：${getErrorMessage(error)} 账号：${isAccountError ? currentUser.user_phone : pullName}`,
+      message: `错误：${getErrorMessage(error)} 账号：${isAccountError ? `+${currentUser.user_phone}` : pullName}`,
     });
     // 账号频繁就过滤拉人账号
     if (errorType === IErrorType.PEER_FLOOD) filterUser(currentUser.user_phone);
