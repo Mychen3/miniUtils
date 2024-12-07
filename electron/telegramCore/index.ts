@@ -162,6 +162,7 @@ const nextPull = () => {
 
 const filterUser = (userPhone: string) => {
   pullInfo.currentUser = pullInfo.currentUser.filter((item) => item.user_phone !== userPhone);
+  pullInfo.currentUserIndex = pullInfo.currentUserIndex === 0 ? 0 : pullInfo.currentUserIndex - 1;
 };
 
 const startPull = async () => {
