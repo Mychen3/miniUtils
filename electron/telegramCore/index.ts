@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import { TelegramClient, sessions, Api } from 'telegram';
 import { IpcKey } from '../ipc/ipcKey';
-import { applayUserStatus, passKey, tgLoginHandle, IErrorType, regex } from '../../common/const';
+import { applayUserStatus, passKey, tgLoginHandle, IErrorType, regex, TgErrorConst } from '../../common/const';
 import { getUserById, insertUser, updateUserStatus, getPageUsers, IUserItem } from '../db/module/user';
 import { getErrorMessage, getErrorTypeMessage } from '../../common/util';
 import { getRiskDictList } from '../db/module/risk';
@@ -178,7 +178,7 @@ const startPull = async () => {
   let client: TelegramClient | null = null;
   let pullName: string = '';
   const currentUser = pullInfo.currentUser[pullInfo.currentUserIndex];
-  console.log(pullInfo.currentUser);
+
   try {
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, { type: 'info', message: '10秒后开始拉取！' });
     await new Promise((resolve) => setTimeout(resolve, 10000));
@@ -211,15 +211,16 @@ const startPull = async () => {
     if (!isAddGroup) return nextPull();
 
     pullName = pullInfo.currentPullNames.pop()!;
-    await client.invoke(
+    const result = await client.invoke(
       new Api.channels.InviteToChannel({
         channel: pullInfo.groupHash,
         users: [pullName],
       }),
     );
+    const isSuccess = result.missingInvitees.length === 0;
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
-      type: 'success',
-      message: `${pullName}邀请成功!`,
+      type: isSuccess ? 'success' : 'error',
+      message: `${pullName}邀请${isSuccess ? '成功' : `失败${TgErrorConst[result.missingInvitees[0].className]}`}!`,
     });
     await client?.destroy();
     nextPull();

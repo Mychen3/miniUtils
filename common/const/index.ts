@@ -43,6 +43,7 @@ enum IErrorType {
   PHONE_NUMBER_INVALID = 'PHONE_NUMBER_INVALID',
   CHAT_INVALID = 'CHAT_INVALID',
   USER_ALREADY_PARTICIPANT = 'USER_ALREADY_PARTICIPANT',
+  Missing_Invitee = 'MissingInvitee',
 }
 
 export type PullHandleMessage = {
@@ -67,6 +68,7 @@ const TgErrorConst: Record<IErrorType, string> = {
   [IErrorType.PHONE_NUMBER_INVALID]: '电话号码无效',
   [IErrorType.CHAT_INVALID]: '邀请失败！',
   [IErrorType.USER_ALREADY_PARTICIPANT]: '用户已经是群成员',
+  [IErrorType.Missing_Invitee]: '用户设置了隐私，无法邀请',
 };
 
 export { systemKey, TgErrorConst, tgLoginHandle, passKey, applayUserStatus, IErrorType, regex };
