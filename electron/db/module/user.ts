@@ -63,7 +63,9 @@ const getPageUsers = async (
       queryParams.push(userStatus);
     }
 
+    // 选择用户的 SQL 查询
     const selectUsersSql = `SELECT * ${baseQuery} LIMIT ? OFFSET ?`;
+    // 计算总数的 SQL 查询，不包含 LIMIT 和 OFFSET
     const countUsersSql = `SELECT COUNT(*) as total ${baseQuery}`;
 
     const stmt = await db.prepare(selectUsersSql);
@@ -73,7 +75,7 @@ const getPageUsers = async (
     queryParams.push(pageSize, offset);
 
     const users = stmt.all(...queryParams);
-    const totalResult = countStmt.get(...queryParams.slice(0, -2));
+    const totalResult = countStmt.get(...queryParams.slice(0, -2)); // 不传递 LIMIT 和 OFFSET 参数
 
     return {
       list: users.map((item) => {

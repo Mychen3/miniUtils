@@ -21,39 +21,50 @@ import type { IUserItem } from 'electron/db/module/user';
 import Icons from '@components/Icons';
 import StatusTag from './components/StatusTag';
 
+type IParams = {
+  page: number;
+  pageSize: number;
+  search: string;
+};
+
 const HomePage = () => {
   const [nameSearch, setNameSearch] = useState('');
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 20,
+    pageSize: 15,
     search: '',
   });
   const [list, setList] = useState<IUserItem[]>([]);
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(1);
 
-  const getList = useMemoizedFn(async () => {
-    setLoading(true);
+  const getList = useMemoizedFn(async (params: IParams) => {
     const res = await window.electronAPI.getPageUsers(params);
-    setList([...res.list]);
+    setList(res.list);
     setTotal(res.total);
     setLoading(false);
   });
 
   const deleteUser = async (userItem: IUserItem) => {
     await window.electronAPI.deleteUser(userItem);
-    await getList();
+    await getList(params);
   };
 
   const refreshUserStatus = async (user_id: number) => {
     setLoading(true);
     await window.electronAPI.refreshUserStatus(user_id);
-    await getList();
+    await getList(params);
+  };
+
+  const onChangePage = (page: number) => {
+    const pageParams = { ...params, page };
+    setParams(pageParams);
+    getList(pageParams);
   };
 
   useMount(async () => {
-    await getList();
+    await getList(params);
   });
 
   return (
@@ -149,17 +160,16 @@ const HomePage = () => {
         </Table>
         <div className="flex w-full justify-center mt-[10px]">
           <Pagination
-            isCompact
             showControls
             showShadow
             color="primary"
             page={params.page}
-            total={total}
-            onChange={(page) => setParams({ ...params, page })}
+            total={Math.ceil(total / params.pageSize)}
+            onChange={onChangePage}
           />
         </div>
       </div>
-      <Login refreshList={getList} onClose={onClose} isOpen={isOpen} onOpenChange={onOpenChange} />
+      <Login refreshList={() => getList(params)} onClose={onClose} isOpen={isOpen} onOpenChange={onOpenChange} />
     </div>
   );
 };
