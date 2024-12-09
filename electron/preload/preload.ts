@@ -33,6 +33,7 @@ const electronAPI = {
   inviteUser: (params: { pullNames: string; groupId: string }) => ipcRenderer.invoke(IpcKey.inviteUser, params),
   onPullHandleMessage: (callback: (event: IpcRendererEvent, params: PullHandleMessage) => void) =>
     ipcRenderer.on(IpcKey.onPullHandleMessage, callback),
+  handleInviteMemberPause: (isStop: boolean) => ipcRenderer.send(IpcKey.handleInviteMemberPause, isStop),
 };
 
 export type IElectronAPI = typeof electronAPI;

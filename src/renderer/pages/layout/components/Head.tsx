@@ -6,6 +6,8 @@ import { useCreation, useMemoizedFn } from 'ahooks';
 import { systemKey } from '@const/publicConst.ts';
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import { useMount } from 'ahooks';
+import useStore from '@src/renderer/store/index';
+import { applayUserStatus } from '@src/../common/const/index';
 import 'react-toastify/dist/ReactToastify.css';
 
 type IConsItem = {
@@ -17,6 +19,7 @@ type IConsItem = {
 const Head = () => {
   const [isMax, setIsMax] = useState(false);
   const [onTop, setOnTop] = useState(false);
+  const { addMsgList, setUserCount, setServeStatus } = useStore();
   const isMac = useCreation(() => {
     // 实验性特性 https://developer.mozilla.org/zh-CN/docs/Web/API/NavigatorUAData
     /* @ts-ignore */
@@ -51,6 +54,22 @@ const Head = () => {
     ],
     [isMax, onTop],
   );
+
+  // 全局监听邀请信息
+  const onPullHandleMessage = useMemoizedFn(() => {
+    window.electronAPI.onPullHandleMessage((_event, params) => {
+      const { type } = params;
+      if (type === 'end') setServeStatus(applayUserStatus.pullWait);
+      if (['error', 'success'].includes(type)) {
+        setUserCount((userCount) => ({
+          total: userCount.total,
+          success: type === 'success' ? userCount.success + 1 : userCount.success,
+          error: type === 'error' ? userCount.error + 1 : userCount.error,
+        }));
+      }
+      addMsgList(params);
+    });
+  });
 
   const onClickIcon = useMemoizedFn((target: IConsItem) => {
     const actionMap: Record<string, () => void> = {
@@ -87,6 +106,7 @@ const Head = () => {
 
   useMount(() => {
     onToastMessage();
+    onPullHandleMessage();
   });
 
   return (

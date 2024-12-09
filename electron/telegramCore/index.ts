@@ -160,6 +160,12 @@ const nextPull = () => {
     handleSetUserIndex();
     startPull();
   }
+  if (pullInfo.pullStatus === applayUserStatus.pullPause) {
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+      type: 'stop',
+      message: '邀请暂停中',
+    });
+  }
 };
 
 const filterUser = (userPhone: string) => {
@@ -239,6 +245,15 @@ const startPull = async () => {
   }
 };
 
+const handleInviteMemberPause = (_event: IpcMainEvent, isStop: boolean) => {
+  if (isStop) {
+    pullInfo.pullStatus = applayUserStatus.pullPause;
+  } else {
+    pullInfo.pullStatus = applayUserStatus.pull;
+    nextPull();
+  }
+};
+
 const pullGroup = async (_event: IpcMainInvokeEvent, params: { pullNames: string; groupId: string }) => {
   pullInfo.currentWin = BrowserWindow.fromWebContents(_event.sender);
   return new Promise(async (resolve, reject) => {
@@ -272,4 +287,4 @@ const addGroup = async (client: TelegramClient, groupId: string) => {
   }
 };
 
-export { handleLogin, refreshUserStatus, pullGroup, addGroup };
+export { handleLogin, refreshUserStatus, pullGroup, addGroup, handleInviteMemberPause };

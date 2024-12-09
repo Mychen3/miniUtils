@@ -16,9 +16,10 @@ import Icons from '@src/renderer/components/Icons';
 import Statistics from './components/Statistics';
 import ImportModal from './components/ImportModal';
 import { useMemo, useState } from 'react';
-import { applayUserStatus, PullHandleMessage } from '@src/../common/const/index';
-import { useMemoizedFn, useMount } from 'ahooks';
+import { applayUserStatus } from '@src/../common/const/index';
+import { useMemoizedFn } from 'ahooks';
 import { toast, Bounce, TypeOptions } from 'react-toastify';
+import useStore from '@src/renderer/store/index';
 const Work = () => {
   const {
     isOpen: isImportModal,
@@ -26,16 +27,11 @@ const Work = () => {
     onOpenChange: onOpenChangeImportModal,
     onClose: onCloseImportModal,
   } = useDisclosure();
+  const { msgList, userCount, serveStatus, setUserCount, setServeStatus } = useStore();
   const [userList, setUserList] = useState<string[]>([]);
-  const [serveStatus, setServeStatus] = useState(applayUserStatus.pullWait);
   const [isGroupModal, setIsGroupModal] = useState(false);
   const [groupUrl, setGroupUrl] = useState('');
-  const [msgList, setMsgList] = useState<PullHandleMessage[]>([]);
-  const [userCount, setUserCount] = useState({
-    total: 0,
-    success: 0,
-    error: 0,
-  });
+  const [isStopLoading, setIsStopLoading] = useState(false);
 
   const sliderValue = useMemo(
     () => (userCount.total === 0 ? 0 : (userCount.success / userCount.total) * 100),
@@ -48,30 +44,12 @@ const Work = () => {
 
   const onClickImport = (userList: string[]) => {
     setUserList(userList);
-    setUserCount({
+    setUserCount((userCount) => ({
       total: userList.length,
-      success: 0,
-      error: 0,
-    });
+      success: userCount.success,
+      error: userCount.error,
+    }));
   };
-
-  const onPullHandleMessage = useMemoizedFn(() => {
-    window.electronAPI.onPullHandleMessage((_event, params) => {
-      if (['end', 'stop'].includes(params.type)) setServeStatus(applayUserStatus.pullWait);
-      if (['error', 'success'].includes(params.type)) {
-        setUserCount((prev) => ({
-          ...prev,
-          error: params.type === 'error' ? prev.error + 1 : prev.error,
-          success: params.type === 'success' ? prev.success + 1 : prev.success,
-        }));
-      }
-      setMsgList((prev) => [...prev, params]);
-    });
-  });
-
-  useMount(() => {
-    onPullHandleMessage();
-  });
 
   const isTelegramLink = (url: string) => {
     const prefix = 'https://t.me/';
@@ -113,14 +91,26 @@ const Work = () => {
     if (serveStatus === applayUserStatus.pullWait) return setIsGroupModal(true);
   };
 
+  const onClickHandlePause = async () => {
+    setIsStopLoading(true);
+    const isPause = serveStatus === applayUserStatus.pull;
+    window.electronAPI.handleInviteMemberPause(isPause);
+    setServeStatus(isPause ? applayUserStatus.pullPause : applayUserStatus.pull);
+    onToastMessage(isPause ? '暂停拉取成功,请等待暂停！' : '继续拉取成功，请稍后！', 'success');
+    setTimeout(() => {
+      setIsStopLoading(false);
+    }, 10000);
+  };
+
   const getMsgColor = useMemoizedFn((type: string) => {
     if (type === 'info') return 'text-default-600';
     if (type === 'success') return 'text-success';
     if (type === 'error') return 'text-danger';
     if (type === 'end') return 'text-purple-500';
+    if (type === 'stop') return 'text-yellow-500';
     return '';
   });
-
+  const isInvite = [applayUserStatus.pull, applayUserStatus.pullPause].includes(serveStatus as applayUserStatus);
   return (
     <div className={styles.container}>
       <div className={styles.search}>
@@ -133,7 +123,7 @@ const Work = () => {
           导入账户
         </Button>
         <Button
-          isLoading={serveStatus === applayUserStatus.pull}
+          isLoading={isInvite}
           color="danger"
           size="sm"
           onClick={onClickInviteUser}
@@ -141,6 +131,11 @@ const Work = () => {
         >
           执行
         </Button>
+        {isInvite && (
+          <Button color="danger" size="sm" isLoading={isStopLoading} onClick={onClickHandlePause}>
+            {serveStatus === applayUserStatus.pullPause ? '继续' : '暂停'}
+          </Button>
+        )}
       </div>
       <div className={styles.content}>
         <Statistics userCount={userCount} />
