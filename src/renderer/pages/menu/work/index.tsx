@@ -15,7 +15,7 @@ import styles from './css/index.module.scss';
 import Icons from '@src/renderer/components/Icons';
 import Statistics from './components/Statistics';
 import ImportModal from './components/ImportModal';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { applayUserStatus } from '@src/../common/const/index';
 import { useMemoizedFn } from 'ahooks';
 import { toast, Bounce, TypeOptions } from 'react-toastify';
@@ -27,8 +27,8 @@ const Work = () => {
     onOpenChange: onOpenChangeImportModal,
     onClose: onCloseImportModal,
   } = useDisclosure();
-  const { msgList, userCount, serveStatus, setUserCount, setServeStatus } = useStore();
-  const [userList, setUserList] = useState<string[]>([]);
+  const { msgList, userCount, serveStatus, setUserCount, setServeStatus, clearMsgList } = useStore();
+  const useListRef = useRef<string[]>([]);
   const [isGroupModal, setIsGroupModal] = useState(false);
   const [groupUrl, setGroupUrl] = useState('');
   const [isStopLoading, setIsStopLoading] = useState(false);
@@ -43,12 +43,13 @@ const Work = () => {
   };
 
   const onClickImport = (userList: string[]) => {
-    setUserList(userList);
-    setUserCount((userCount) => ({
+    useListRef.current = userList;
+    setUserCount(() => ({
       total: userList.length,
-      success: userCount.success,
-      error: userCount.error,
+      success: 0,
+      error: 0,
     }));
+    clearMsgList();
   };
 
   const isTelegramLink = (url: string) => {
@@ -75,9 +76,9 @@ const Work = () => {
     try {
       if (serveStatus === applayUserStatus.pullWait) {
         if (!isTelegramLink(groupUrl)) return onToastMessage('请输入正确的群组链接', 'error');
-        if (userList.length === 0) return onToastMessage('请导入账户', 'error');
+        if (useListRef.current.length === 0) return onToastMessage('请导入账户', 'error');
         if (!groupUrl) return;
-        await window.electronAPI.inviteUser({ pullNames: userList.join(','), groupId: groupUrl });
+        await window.electronAPI.inviteUser({ pullNames: useListRef.current.join(','), groupId: groupUrl });
         setServeStatus(applayUserStatus.pull);
         setIsGroupModal(false);
       }

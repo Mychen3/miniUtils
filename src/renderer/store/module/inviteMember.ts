@@ -16,6 +16,7 @@ export interface IInviteMember {
   };
   serveStatus: keyof typeof applayUserStatus;
   addMsgList: (msg: PullHandleMessage) => void;
+  clearMsgList: () => void;
   setUserCount: (updateFn: IUpdateUserCount) => void;
   setServeStatus: (serveStatus: keyof typeof applayUserStatus) => void;
 }
@@ -29,6 +30,7 @@ export const createInviteMember: StateCreator<IInviteMember, [], [], IInviteMemb
   },
   serveStatus: applayUserStatus.pullWait,
   addMsgList: (msg: PullHandleMessage) => set((state) => ({ msgList: [...state.msgList, msg] })),
+  clearMsgList: () => set({ msgList: [] }),
   setUserCount: (updateFn: IUpdateUserCount) => set({ userCount: updateFn(get().userCount) }),
   setServeStatus: (serveStatus: keyof typeof applayUserStatus) => set({ serveStatus }),
 });
