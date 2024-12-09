@@ -20,6 +20,7 @@ import { applayUserStatus } from '@src/../common/const/index';
 import { useMemoizedFn } from 'ahooks';
 import { toast, Bounce, TypeOptions } from 'react-toastify';
 import useStore from '@src/renderer/store/index';
+import ScreenTableModal from './components/ScreenTableModal';
 const Work = () => {
   const {
     isOpen: isImportModal,
@@ -32,6 +33,7 @@ const Work = () => {
   const [isGroupModal, setIsGroupModal] = useState(false);
   const [groupUrl, setGroupUrl] = useState('');
   const [isStopLoading, setIsStopLoading] = useState(false);
+  const [isScreenTableModal, setIsScreenTableModal] = useState(false);
 
   const sliderValue = useMemo(
     () => (userCount.total === 0 ? 0 : (userCount.success / userCount.total) * 100),
@@ -121,7 +123,15 @@ const Work = () => {
           endContent={<Icons name="databaseImportOutline" />}
           onClick={onClickOpenImportModal}
         >
-          导入账户
+          导入账号
+        </Button>
+        <Button
+          color="primary"
+          size="sm"
+          endContent={<Icons name="accountFilterOutline" />}
+          onClick={() => setIsScreenTableModal(true)}
+        >
+          筛选用户
         </Button>
         <Button
           isLoading={isInvite}
@@ -174,6 +184,7 @@ const Work = () => {
         onOpenChange={onOpenChangeImportModal}
         onClose={onCloseImportModal}
       />
+      <ScreenTableModal isOpen={isScreenTableModal} onClose={() => setIsScreenTableModal(false)} />
       <Modal isOpen={isGroupModal} size="xl" isDismissable={false} onClose={() => setIsGroupModal(false)}>
         <ModalContent>
           <ModalHeader>导入账户（感谢邱老板的KFC，拐哥的奶茶）</ModalHeader>
