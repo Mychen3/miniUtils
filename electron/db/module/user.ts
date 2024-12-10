@@ -100,4 +100,9 @@ const deleteUser = async (_event: IpcMainInvokeEvent, userItem: IUserItem) => {
   }
 };
 
-export { insertUser, getPageUsers, getAllUsers, deleteUser, getUserById, updateUserStatus };
+const getUsersByIds = (ids: number[], userStatus: string) => {
+  const stmt = db.prepare(`SELECT * FROM users WHERE user_id IN (${ids.map(() => '?').join(',')}) AND user_status = ?`);
+  return stmt.all(...ids, userStatus) as IUserItem[];
+};
+
+export { insertUser, getPageUsers, getAllUsers, deleteUser, getUserById, updateUserStatus, getUsersByIds };

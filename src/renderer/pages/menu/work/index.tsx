@@ -34,7 +34,7 @@ const Work = () => {
   const [groupUrl, setGroupUrl] = useState('');
   const [isStopLoading, setIsStopLoading] = useState(false);
   const [isScreenTableModal, setIsScreenTableModal] = useState(false);
-
+  const [selectedUserList, setSelectedUserList] = useState<string[]>([]);
   const sliderValue = useMemo(
     () => (userCount.total === 0 ? 0 : (userCount.success / userCount.total) * 100),
     [userCount],
@@ -77,10 +77,15 @@ const Work = () => {
   const onStartInvite = async () => {
     try {
       if (serveStatus === applayUserStatus.pullWait) {
+        if (selectedUserList.length === 0) return onToastMessage('请先选择账户', 'error');
         if (!isTelegramLink(groupUrl)) return onToastMessage('请输入正确的群组链接', 'error');
         if (useListRef.current.length === 0) return onToastMessage('请导入账户', 'error');
         if (!groupUrl) return;
-        await window.electronAPI.inviteUser({ pullNames: useListRef.current.join(','), groupId: groupUrl });
+        await window.electronAPI.inviteUser({
+          pullNames: useListRef.current.join(','),
+          groupId: groupUrl,
+          userIds: selectedUserList.join(','),
+        });
         setServeStatus(applayUserStatus.pull);
         setIsGroupModal(false);
       }
@@ -184,7 +189,12 @@ const Work = () => {
         onOpenChange={onOpenChangeImportModal}
         onClose={onCloseImportModal}
       />
-      <ScreenTableModal isOpen={isScreenTableModal} onClose={() => setIsScreenTableModal(false)} />
+      <ScreenTableModal
+        isOpen={isScreenTableModal}
+        onClose={() => setIsScreenTableModal(false)}
+        selectedUserList={selectedUserList}
+        onChangeSelection={setSelectedUserList}
+      />
       <Modal isOpen={isGroupModal} size="xl" isDismissable={false} onClose={() => setIsGroupModal(false)}>
         <ModalContent>
           <ModalHeader>导入账户（感谢邱老板的KFC，拐哥的奶茶）</ModalHeader>

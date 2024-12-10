@@ -2,7 +2,7 @@ import { BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electr
 import { TelegramClient, sessions, Api } from 'telegram';
 import { IpcKey } from '../ipc/ipcKey';
 import { applayUserStatus, passKey, tgLoginHandle, IErrorType, regex, TgErrorConst } from '../../common/const';
-import { getUserById, insertUser, updateUserStatus, getPageUsers, IUserItem } from '../db/module/user';
+import { getUserById, insertUser, updateUserStatus, getUsersByIds, IUserItem } from '../db/module/user';
 import { getErrorMessage, getErrorTypeMessage } from '../../common/util';
 import { getRiskDictList } from '../db/module/risk';
 
@@ -254,14 +254,17 @@ const handleInviteMemberPause = (_event: IpcMainEvent, isStop: boolean) => {
   }
 };
 
-const pullGroup = async (_event: IpcMainInvokeEvent, params: { pullNames: string; groupId: string }) => {
+const pullGroup = async (
+  _event: IpcMainInvokeEvent,
+  params: { pullNames: string; groupId: string; userIds: string },
+) => {
   pullInfo.currentWin = BrowserWindow.fromWebContents(_event.sender);
   return new Promise(async (resolve, reject) => {
     if (pullInfo.pullStatus === applayUserStatus.pull) return reject('当前正在拉取中');
-    const userList = await getPageUsers(_event, { userStatus: passKey.pass, isSession: true });
-    if (!userList || userList?.list.length === 0) return reject('没有可使用的账号');
+    const userList = await getUsersByIds(params.userIds.split(',').map(Number), passKey.pass);
+    if (!userList || userList.length === 0) return reject('没有可使用的账号');
     if (pullInfo.pullStatus === applayUserStatus.pullWait) {
-      pullInfo.currentUser = userList.list as IUserItem[];
+      pullInfo.currentUser = userList as IUserItem[];
       pullInfo.currentPullNames = params.pullNames.split(',');
       pullInfo.groupHash = params.groupId.split('/').pop() as string;
       // 开始拉取

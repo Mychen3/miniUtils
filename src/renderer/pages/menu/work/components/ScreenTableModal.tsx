@@ -4,7 +4,6 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -13,18 +12,20 @@ import {
   TableRow,
   Button,
 } from '@nextui-org/react';
+import type { Selection } from '@react-types/shared';
 import StatusTag from '@src/renderer/pages/homePage/components/StatusTag';
 import { IUserItem } from 'electron/db/module/user';
 import { useRef, useState } from 'react';
-import styles from '../css/screenTableModal.module.scss';
-import { useMemoizedFn, useMount } from 'ahooks';
+import { useMemoizedFn, useMount, useUpdateEffect } from 'ahooks';
 
 type IScreenTableModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  selectedUserList: string[];
+  onChangeSelection: (keys: string[]) => void;
 };
 
-const ScreenTableModal = ({ isOpen, onClose }: IScreenTableModalProps) => {
+const ScreenTableModal = ({ isOpen, onClose, selectedUserList, onChangeSelection }: IScreenTableModalProps) => {
   const [list, setList] = useState<IUserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const params = useRef({
@@ -32,6 +33,7 @@ const ScreenTableModal = ({ isOpen, onClose }: IScreenTableModalProps) => {
     pageSize: 10,
   });
   const [total, setTotal] = useState(0);
+  const oldSelectedList = useRef<string[]>([]);
 
   const getList = useMemoizedFn(async (params) => {
     setLoading(true);
@@ -41,25 +43,35 @@ const ScreenTableModal = ({ isOpen, onClose }: IScreenTableModalProps) => {
     setTotal(res.total);
   });
 
-  const onSelectUser = () => {
-    console.log(list);
+  const onChangeSelectedList = (row: Selection) => {
+    if (row === 'all') return onChangeSelection(list.map((item) => item.user_id.toString()));
+    onChangeSelection(Array.from(row) as string[]);
   };
+
+  const onCloseModal = () => {
+    onClose();
+    onChangeSelection(oldSelectedList.current);
+  };
+
+  useUpdateEffect(() => {
+    if (isOpen) oldSelectedList.current = [...selectedUserList];
+  }, [isOpen]);
 
   const onLoadMore = async () => {
     params.current.page++;
     await getList(params.current);
   };
 
-  useMount(async () => {
-    await getList(params.current);
-  });
+  useMount(async () => await getList(params.current));
 
   return (
-    <Modal isOpen={isOpen} size="xl" isDismissable={false} onClose={onClose}>
+    <Modal isOpen={isOpen} size="xl" isDismissable={false} onClose={onCloseModal}>
       <ModalContent>
         <ModalHeader>筛选账户</ModalHeader>
         <ModalBody>
           <Table
+            selectedKeys={selectedUserList}
+            onSelectionChange={onChangeSelectedList}
             selectionMode="multiple"
             isStriped
             isHeaderSticky
@@ -72,7 +84,7 @@ const ScreenTableModal = ({ isOpen, onClose }: IScreenTableModalProps) => {
             bottomContent={
               total > list.length ? (
                 <div className="flex w-full justify-center">
-                  <Button isDisabled={loading} variant="flat" onPress={onLoadMore}>
+                  <Button isLoading={loading} variant="flat" onPress={onLoadMore}>
                     加载更多
                   </Button>
                 </div>
@@ -85,18 +97,7 @@ const ScreenTableModal = ({ isOpen, onClose }: IScreenTableModalProps) => {
               <TableColumn align="center">手机号</TableColumn>
               <TableColumn align="center">状态</TableColumn>
             </TableHeader>
-            <TableBody
-              emptyContent="暂无数据"
-              isLoading={loading}
-              loadingContent={
-                <Spinner
-                  classNames={{
-                    label: styles.someClass,
-                  }}
-                  size="lg"
-                />
-              }
-            >
+            <TableBody emptyContent="暂无数据">
               {list.map((item, index) => (
                 <TableRow key={item.user_id}>
                   <TableCell>{index + 1}</TableCell>
@@ -113,10 +114,10 @@ const ScreenTableModal = ({ isOpen, onClose }: IScreenTableModalProps) => {
           </Table>
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" variant="flat" onPress={onClose}>
+          <Button color="danger" variant="flat" onPress={onCloseModal}>
             取消
           </Button>
-          <Button color="primary" onPress={onSelectUser}>
+          <Button color="primary" onPress={onClose}>
             确定
           </Button>
         </ModalFooter>

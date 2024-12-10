@@ -30,7 +30,8 @@ const electronAPI = {
   addRiskDict: (params: { riskStatus: string; riskValue: string }) => ipcRenderer.invoke(IpcKey.addRiskDict, params),
   getRiskDictList: () => ipcRenderer.invoke(IpcKey.getRiskDictList) as Promise<Array<RiskDictItem>>,
   deleteRiskDict: (risk_id: number) => ipcRenderer.invoke(IpcKey.deleteRiskDict, { risk_id }),
-  inviteUser: (params: { pullNames: string; groupId: string }) => ipcRenderer.invoke(IpcKey.inviteUser, params),
+  inviteUser: (params: { pullNames: string; groupId: string; userIds: string }) =>
+    ipcRenderer.invoke(IpcKey.inviteUser, params),
   onPullHandleMessage: (callback: (event: IpcRendererEvent, params: PullHandleMessage) => void) =>
     ipcRenderer.on(IpcKey.onPullHandleMessage, callback),
   handleInviteMemberPause: (isStop: boolean) => ipcRenderer.send(IpcKey.handleInviteMemberPause, isStop),
