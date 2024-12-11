@@ -3,6 +3,8 @@ import Head from './components/Head.tsx';
 import Menu from './components/Menu.tsx';
 import { Outlet } from 'react-router-dom';
 import styles from './css/index.module.scss';
+import { Suspense } from 'react';
+import { Spinner } from '@nextui-org/react';
 
 const Layout = () => (
   <div className="box-border">
@@ -16,7 +18,9 @@ const Layout = () => (
         <Menu></Menu>
       </div>
       <div className="w-[calc(100vw-100px)] flex-auto box-border">
-        <Outlet />
+        <Suspense fallback={<Spinner size="lg" />}>
+          <Outlet />
+        </Suspense>
       </div>
     </div>
   </div>

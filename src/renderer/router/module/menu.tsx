@@ -1,7 +1,10 @@
+import { lazy } from 'react';
 import HomePage from '@pages/homePage/index';
-import RiskDict from '@pages/menu/riskDict';
-import Work from '@pages/menu/work';
 import type { IconSetType } from '@src/common/constants/iconSet';
+
+const Work = lazy(() => import('@pages/menu/work'));
+const Flag = lazy(() => import('@pages/menu/flag'));
+const RiskDict = lazy(() => import('@pages/menu/riskDict'));
 
 export type IMenuTypeItem = {
   path: string;
@@ -36,6 +39,14 @@ const routes: IMenuTypeItem[] = [
     element: <Work />,
     meta: {
       title: '邀请',
+      icon: 'userAddOutline',
+    },
+  },
+  {
+    path: 'flag',
+    element: <Flag />,
+    meta: {
+      title: '标记',
       icon: 'userAddOutline',
     },
   },
