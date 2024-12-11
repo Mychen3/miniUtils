@@ -46,8 +46,8 @@ const routes: IMenuTypeItem[] = [
     path: 'flag',
     element: <Flag />,
     meta: {
-      title: '标记',
-      icon: 'userAddOutline',
+      title: '采集',
+      icon: 'flagVariantPlusOutline',
     },
   },
 ];

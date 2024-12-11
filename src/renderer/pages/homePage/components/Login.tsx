@@ -92,11 +92,13 @@ const Login = ({ isOpen, onOpenChange, refreshList, onClose }: ILoginProps) => {
                     onChange={(e) => setInputParams({ ...inputParams, areaCode: e.target.value })}
                     variant="bordered"
                     size="lg"
+                    placeholder="区号"
                   />
                   <Input
                     endContent={
                       <Icons name="cellphone" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                     }
+                    placeholder="手机号"
                     value={inputParams.username}
                     onChange={(e) => setInputParams({ ...inputParams, username: e.target.value })}
                     variant="bordered"

@@ -26,6 +26,8 @@ const IconSet = {
   errorOutline: lazy(() => import('~icons/mdi/error-outline')),
   cellphone: lazy(() => import('~icons/mdi/cellphone')),
   accountFilterOutline: lazy(() => import('~icons/mdi/account-filter-outline')),
+  questionMarkCircle: lazy(() => import('~icons/mdi/question-mark-circle')),
+  flagVariantPlusOutline: lazy(() => import('~icons/mdi/flag-variant-plus-outline')),
 };
 
 type IconSetType = keyof typeof IconSet;

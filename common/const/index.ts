@@ -22,9 +22,23 @@ enum applayUserStatus {
   pullWait = 'pullWait', // 待拉取
 }
 
+enum GatherStatus {
+  gather = 'Gather', // 采集中
+  awaitGather = 'awaitGather', // 待采集
+}
+
+enum GatherTime {
+  day = 'day', // 1天
+  threeDay = 'threeDay', // 3天
+  monday = 'Monday', // 1周
+}
+
 const regex = {
   isUserExist: /^No user has "([^"]+)" as username$/,
 };
+
+const apiId = Number(import.meta.env.VITE_TG_API_ID);
+const apiHash = import.meta.env.VITE_TG_API_HASH;
 
 enum IErrorType {
   PHONE_CODE_INVALI = 'PHONE_CODE_INVALI',
@@ -44,6 +58,7 @@ enum IErrorType {
   CHAT_INVALID = 'CHAT_INVALID',
   USER_ALREADY_PARTICIPANT = 'USER_ALREADY_PARTICIPANT',
   Missing_Invitee = 'MissingInvitee',
+  YOU_BLOCKED_USER = 'YOU_BLOCKED_USER',
 }
 
 export type PullHandleMessage = {
@@ -69,6 +84,19 @@ const TgErrorConst: Record<IErrorType, string> = {
   [IErrorType.CHAT_INVALID]: '邀请失败！',
   [IErrorType.USER_ALREADY_PARTICIPANT]: '用户已经是群成员',
   [IErrorType.Missing_Invitee]: '用户设置了隐私，无法邀请',
+  [IErrorType.YOU_BLOCKED_USER]: '您已将该用户（或机器人）拉黑',
 };
 
-export { systemKey, TgErrorConst, tgLoginHandle, passKey, applayUserStatus, IErrorType, regex };
+export {
+  systemKey,
+  TgErrorConst,
+  tgLoginHandle,
+  passKey,
+  applayUserStatus,
+  IErrorType,
+  regex,
+  GatherStatus,
+  GatherTime,
+  apiId,
+  apiHash,
+};

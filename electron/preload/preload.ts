@@ -5,7 +5,7 @@ import type { QueueItem } from '../workr/TimedQueue.ts';
 import type { TypeOptions } from 'react-toastify';
 import type { IUserItem } from '../db/module/user';
 import type { RiskDictItem } from '../db/module/risk';
-import type { PullHandleMessage } from '../../common/const';
+import type { PullHandleMessage, GatherTime } from '../../common/const';
 
 const electronAPI = {
   windowClose: () => ipcRenderer.send(IpcKey.close),
@@ -23,7 +23,7 @@ const electronAPI = {
   ) => ipcRenderer.on(IpcKey.onTgLoginHandle, callback),
   onToastMessage: (callback: (event: IpcRendererEvent, message: string, type: TypeOptions) => void) =>
     ipcRenderer.on(IpcKey.onToastMessage, callback),
-  getPageUsers: (params: { page: number; pageSize: number; search: string }) =>
+  getPageUsers: (params: { page: number; pageSize: number; phone: string }) =>
     ipcRenderer.invoke(IpcKey.getPageUsers, params) as Promise<{ list: IUserItem[]; total: number }>,
   deleteUser: (userItem: IUserItem) => ipcRenderer.invoke(IpcKey.deleteUser, userItem),
   refreshUserStatus: (user_id: number) => ipcRenderer.invoke(IpcKey.refreshUserStatus, user_id),
@@ -35,6 +35,8 @@ const electronAPI = {
   onPullHandleMessage: (callback: (event: IpcRendererEvent, params: PullHandleMessage) => void) =>
     ipcRenderer.on(IpcKey.onPullHandleMessage, callback),
   handleInviteMemberPause: (isStop: boolean) => ipcRenderer.send(IpcKey.handleInviteMemberPause, isStop),
+  handleFlagMember: (params: { groupId: string; flagNumber: number; flagTime: keyof typeof GatherTime }) =>
+    ipcRenderer.send(IpcKey.handleFlagMember, params),
 };
 
 export type IElectronAPI = typeof electronAPI;

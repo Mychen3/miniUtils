@@ -21,6 +21,8 @@ import { useMemoizedFn } from 'ahooks';
 import { toast, Bounce, TypeOptions } from 'react-toastify';
 import useStore from '@src/renderer/store/index';
 import ScreenTableModal from './components/ScreenTableModal';
+import { motion } from 'framer-motion';
+
 const Work = () => {
   const {
     isOpen: isImportModal,
@@ -121,68 +123,70 @@ const Work = () => {
   const isInvite = [applayUserStatus.pull, applayUserStatus.pullPause].includes(serveStatus as applayUserStatus);
   return (
     <div className={styles.container}>
-      <div className={styles.search}>
-        <Button
-          color="primary"
-          size="sm"
-          endContent={<Icons name="databaseImportOutline" />}
-          onClick={onClickOpenImportModal}
-        >
-          导入账号
-        </Button>
-        <Button
-          color="primary"
-          size="sm"
-          endContent={<Icons name="accountFilterOutline" />}
-          onClick={() => setIsScreenTableModal(true)}
-        >
-          筛选用户
-        </Button>
-        <Button
-          isLoading={isInvite}
-          color="danger"
-          size="sm"
-          onClick={onClickInviteUser}
-          endContent={<Icons name="stopwatchStartOutline" />}
-        >
-          执行
-        </Button>
-        {isInvite && (
-          <Button color="danger" size="sm" isLoading={isStopLoading} onClick={onClickHandlePause}>
-            {serveStatus === applayUserStatus.pullPause ? '继续' : '暂停'}
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35 }}>
+        <div className={styles.search}>
+          <Button
+            color="primary"
+            size="sm"
+            endContent={<Icons name="databaseImportOutline" />}
+            onClick={onClickOpenImportModal}
+          >
+            导入账号
           </Button>
-        )}
-      </div>
-      <div className={styles.content}>
-        <Statistics userCount={userCount} />
-        <Slider
-          size="md"
-          value={sliderValue}
-          step={1}
-          maxValue={100}
-          minValue={0}
-          aria-label="Temperature"
-          defaultValue={80}
-          hideThumb={true}
-          classNames={{
-            filler: 'bg-gradient-to-r from-[#006FEE] to-[#A300FF] ',
-          }}
-        />
-        <div className="box-border">
-          <div className="my-[5px] text-default-600 font-[600]">记录：</div>
-          <Card>
-            <CardBody>
-              <div className="w-[calc(100%)] h-[calc(100vh-305px)] overflow-y-auto">
-                {msgList.map((item, index) => (
-                  <p key={index} className={getMsgColor(item.type)}>
-                    {item.message}
-                  </p>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
+          <Button
+            color="primary"
+            size="sm"
+            endContent={<Icons name="accountFilterOutline" />}
+            onClick={() => setIsScreenTableModal(true)}
+          >
+            筛选用户
+          </Button>
+          <Button
+            isLoading={isInvite}
+            color="danger"
+            size="sm"
+            onClick={onClickInviteUser}
+            endContent={<Icons name="stopwatchStartOutline" />}
+          >
+            执行
+          </Button>
+          {isInvite && (
+            <Button color="danger" size="sm" isLoading={isStopLoading} onClick={onClickHandlePause}>
+              {serveStatus === applayUserStatus.pullPause ? '继续' : '暂停'}
+            </Button>
+          )}
         </div>
-      </div>
+        <div className={styles.content}>
+          <Statistics userCount={userCount} />
+          <Slider
+            size="md"
+            value={sliderValue}
+            step={1}
+            maxValue={100}
+            minValue={0}
+            aria-label="Temperature"
+            defaultValue={80}
+            hideThumb={true}
+            classNames={{
+              filler: 'bg-gradient-to-r from-[#006FEE] to-[#A300FF] ',
+            }}
+          />
+          <div className="box-border">
+            <div className="my-[5px] text-default-600 font-[600]">记录：</div>
+            <Card>
+              <CardBody>
+                <div className="w-[calc(100%)] h-[calc(100vh-305px)] overflow-y-auto">
+                  {msgList.map((item, index) => (
+                    <p key={index} className={getMsgColor(item.type)}>
+                      {item.message}
+                    </p>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+        </div>
+      </motion.div>
       <ImportModal
         isOpen={isImportModal}
         onClickImport={onClickImport}

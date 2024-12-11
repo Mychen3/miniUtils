@@ -13,7 +13,8 @@ import {
 } from './ipc/mainIpc.ts';
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
-import { handleLogin, refreshUserStatus, pullGroup, handleInviteMemberPause } from './telegramCore';
+import { handleLogin, refreshUserStatus } from './telegramCore';
+import { pullGroup, handleInviteMemberPause } from './telegramCore/pullModule';
 import { deleteUser, getPageUsers } from './db/module/user.ts';
 import { addRiskDict, getRiskDictList, deleteRiskDict } from './db/module/risk.ts';
 import { registerKeyboard } from './global/keyboard.ts';
@@ -83,6 +84,17 @@ function createWindow() {
     ipcMainHandMap.forEach((_value, key) => ipcMain.removeHandler(key));
   });
 }
+
+const isSingleInstance = app.requestSingleInstanceLock();
+
+if (!isSingleInstance) app.quit();
+
+app.on('second-instance', (_, _commandLine, _workingDirectory) => {
+  if (win) {
+    if (win.isMinimized()) win.restore();
+    win.focus();
+  }
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

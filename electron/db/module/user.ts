@@ -42,24 +42,24 @@ const updateUserStatus = async (user_id: number, user_status: string) => {
 
 const getPageUsers = async (
   _event: IpcMainInvokeEvent,
-  params: { page?: number; pageSize?: number; search?: string; userStatus?: string; isSession?: boolean },
+  params: { page?: number; pageSize?: number; phone?: string; userStatus?: string; isSession?: boolean },
 ) => {
   try {
-    const { page = 1, pageSize = Number.MAX_SAFE_INTEGER, search = '', userStatus, isSession = false } = params;
+    const { page = 1, pageSize = Number.MAX_SAFE_INTEGER, phone = '', userStatus, isSession = false } = params;
     // 计算 OFFSET 的起始位置
     const offset = (page - 1) * pageSize;
 
-    // 根据 search 和 userStatus 参数的值动态构建 SQL 查询
+    // 根据 phone 和 userStatus 参数的值动态构建 SQL 查询
     let baseQuery = `FROM users`;
     const queryParams: (string | number)[] = [];
 
-    if (search.trim() !== '') {
-      baseQuery += ` WHERE user_name LIKE ?`;
-      queryParams.push(`%${search}%`);
+    if (phone.trim() !== '') {
+      baseQuery += ` WHERE user_phone LIKE ?`;
+      queryParams.push(`%${phone}%`);
     }
 
     if (userStatus) {
-      baseQuery += search.trim() !== '' ? ` AND user_status = ?` : ` WHERE user_status = ?`;
+      baseQuery += phone.trim() !== '' ? ` AND user_status = ?` : ` WHERE user_status = ?`;
       queryParams.push(userStatus);
     }
 
