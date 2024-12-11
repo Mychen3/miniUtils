@@ -198,6 +198,7 @@ const Work = () => {
         onClose={() => setIsScreenTableModal(false)}
         selectedUserList={selectedUserList}
         onChangeSelection={setSelectedUserList}
+        selectionMode="multiple"
       />
       <Modal isOpen={isGroupModal} size="xl" isDismissable={false} onClose={() => setIsGroupModal(false)}>
         <ModalContent>

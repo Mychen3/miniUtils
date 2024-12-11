@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
   Button,
+  SelectionMode,
 } from '@nextui-org/react';
 import type { Selection } from '@react-types/shared';
 import StatusTag from '@src/renderer/pages/homePage/components/StatusTag';
@@ -23,14 +24,21 @@ type IScreenTableModalProps = {
   onClose: () => void;
   selectedUserList: string[];
   onChangeSelection: (keys: string[]) => void;
+  selectionMode: SelectionMode;
 };
 
-const ScreenTableModal = ({ isOpen, onClose, selectedUserList, onChangeSelection }: IScreenTableModalProps) => {
+const ScreenTableModal = ({
+  isOpen,
+  onClose,
+  selectedUserList,
+  onChangeSelection,
+  selectionMode = 'multiple',
+}: IScreenTableModalProps) => {
   const [list, setList] = useState<IUserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const params = useRef({
     page: 1,
-    pageSize: 10,
+    pageSize: 15,
   });
   const [total, setTotal] = useState(0);
   const oldSelectedList = useRef<string[]>([]);
@@ -70,9 +78,10 @@ const ScreenTableModal = ({ isOpen, onClose, selectedUserList, onChangeSelection
         <ModalHeader>筛选账户</ModalHeader>
         <ModalBody>
           <Table
+            color="primary"
             selectedKeys={selectedUserList}
             onSelectionChange={onChangeSelectedList}
-            selectionMode="multiple"
+            selectionMode={selectionMode}
             isStriped
             isHeaderSticky
             aria-label="Example static collection table"

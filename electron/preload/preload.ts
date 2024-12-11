@@ -35,8 +35,12 @@ const electronAPI = {
   onPullHandleMessage: (callback: (event: IpcRendererEvent, params: PullHandleMessage) => void) =>
     ipcRenderer.on(IpcKey.onPullHandleMessage, callback),
   handleInviteMemberPause: (isStop: boolean) => ipcRenderer.send(IpcKey.handleInviteMemberPause, isStop),
-  handleFlagMember: (params: { groupId: string; flagNumber: number; flagTime: keyof typeof GatherTime }) =>
-    ipcRenderer.send(IpcKey.handleFlagMember, params),
+  handleFlagMember: (params: {
+    groupId: string;
+    flagNumber: number;
+    flagTime: keyof typeof GatherTime;
+    userId: number;
+  }) => ipcRenderer.send(IpcKey.handleFlagMember, params),
 };
 
 export type IElectronAPI = typeof electronAPI;

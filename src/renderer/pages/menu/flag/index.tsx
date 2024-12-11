@@ -1,13 +1,16 @@
 import styles from './css/index.module.scss';
 import { Input, Card, CardBody, Radio, RadioGroup, Tooltip, Button } from '@nextui-org/react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import useStore from '@src/renderer/store';
 import Icons from '@src/renderer/components/Icons';
-import { GatherTime } from '@src/../common/const/index';
+import { GatherStatus, GatherTime } from '@src/../common/const/index';
+import ScreenTableModal from '../work/components/ScreenTableModal';
 
 const Flag = () => {
-  const { gatherCounts, gatherTime, setGatherTime, setGatherUrl, gatherUrl } = useStore();
-
+  const { gatherCounts, gatherTime, setGatherTime, setGatherUrl, gatherUrl, gatherStatus } = useStore();
+  const [isScreenTableModal, setIsScreenTableModal] = useState(false);
+  const [selectedUserList, setSelectedUserList] = useState<string[]>([]);
   return (
     <div className={styles.container}>
       <div className={styles.tabsContainer}>
@@ -69,6 +72,29 @@ const Flag = () => {
                     <Radio value={GatherTime.threeDay}>3天</Radio>
                     <Radio value={GatherTime.monday}>7天</Radio>
                   </RadioGroup>
+                  <div className="mt-[20px]  text-[16px]">
+                    选择用户
+                    <Tooltip
+                      classNames={{
+                        base: 'w-[200px]',
+                      }}
+                      content="选择的用户必须在群内!"
+                      placement="top"
+                      color="foreground"
+                    >
+                      <button>
+                        <Icons name="questionMarkCircle" className="text-primary size-[14px]" />
+                      </button>
+                    </Tooltip>
+                  </div>
+                  <Button
+                    color="primary"
+                    endContent={<Icons name="user" />}
+                    className="mt-[10px]"
+                    onPress={() => setIsScreenTableModal(true)}
+                  >
+                    筛选用户
+                  </Button>
                   <Input
                     label="采集数量"
                     labelPlacement="outside"
@@ -79,17 +105,32 @@ const Flag = () => {
                     type="number"
                   />
                 </div>
-                <div className="mt-[80px] grid grid-cols-4 gap-5 pt-[10px]">
+
+                <div
+                  className={`mt-[20px] grid gap-5 pt-[10px] transition-all duration-300 ${gatherStatus === GatherStatus.gather ? 'grid-cols-5' : 'grid-cols-4 '}`}
+                >
                   <Button color="primary">群发言采集</Button>
                   <Button color="primary">群成员采集</Button>
                   <Button color="primary">导出</Button>
                   <Button color="primary">复制</Button>
+                  {gatherStatus === GatherStatus.gather && (
+                    <Button color="danger" className="mt-[10px]">
+                      停止
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>
           </CardBody>
         </Card>
       </div>
+      <ScreenTableModal
+        isOpen={isScreenTableModal}
+        onClose={() => setIsScreenTableModal(false)}
+        selectedUserList={selectedUserList}
+        onChangeSelection={setSelectedUserList}
+        selectionMode="single"
+      />
     </div>
   );
 };
