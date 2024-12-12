@@ -150,4 +150,61 @@ const handleFlagMemberTell = async (
   }
 };
 
-export { handleFlagMemberTell, handleFlagMemberTellStop, exportFlagMember };
+const getGroupMemberList = async (
+  _event: IpcMainInvokeEvent,
+  params: { groupId: string; flagNumber: number; userId: number },
+) => {
+  const win = BrowserWindow.fromWebContents(_event.sender);
+  isStop = false;
+  speakerIdList = [];
+  let clientGlobal: TelegramClient | null = null;
+  try {
+    const { groupId, flagNumber, userId } = params;
+    const result = await getFlagTellInfo(userId, groupId)!;
+    if (!result) throw new Error('获取群组信息失败');
+    const { client, adminList, groupEntity } = result;
+    clientGlobal = client;
+    if (!client || !groupEntity) throw new Error('客户端或群组实体不存在');
+    let offset = 0;
+    const limit = 30; // 每次获取的成员数量
+    while (speakerIdList.length < flagNumber) {
+      if (isStop) break;
+      const participants = await client.getParticipants(groupEntity, {
+        limit: limit,
+        offset: offset,
+      });
+      if (participants.length === 0) break; // 如果没有更多成员，退出循环
+      // 将成员用户名添加到列表中
+      const usernames = Array.from(participants.values())
+        // 过滤掉空和管理员
+        .filter((item) => item.username)
+        .map((item) => `@${item.username}`)
+        .filter((name) => !adminList.includes(name));
+
+      speakerIdList.push(...usernames);
+      offset += limit; // 增加偏移量，获取下一批成员
+      win?.webContents.send(IpcKey.onFlagMemberInfo, {
+        successNumber: speakerIdList.length,
+        type: 'success',
+      });
+      if (speakerIdList.length >= flagNumber) break;
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+      // 如果达到最大收集数量或时间限制，退出外层循环
+    }
+    await client.destroy();
+    win?.webContents.send(IpcKey.onFlagMemberInfo, {
+      successNumber: speakerIdList.length,
+      type: 'end',
+      message: '采集完成',
+    });
+  } catch (error) {
+    if (clientGlobal) await clientGlobal.destroy();
+    win?.webContents.send(IpcKey.onFlagMemberInfo, {
+      type: 'error',
+      message: `采集失败：${error}`,
+    });
+    console.error(error);
+  }
+};
+
+export { handleFlagMemberTell, handleFlagMemberTellStop, exportFlagMember, getGroupMemberList };

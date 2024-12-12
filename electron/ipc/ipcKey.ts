@@ -23,4 +23,5 @@ export enum IpcKey {
   onFlagMemberInfo = 'onFlagMemberInfo', // 采集群发言
   handleFlagMemberTellStop = 'handleFlagMemberTellStop', // 停止采集群发言
   exportFlagMember = 'exportFlagMember', // 导出采集群发言
+  getGroupMemberList = 'getGroupMemberList', // 获取群成员列表
 }

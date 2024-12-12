@@ -45,6 +45,8 @@ const electronAPI = {
     ipcRenderer.on(IpcKey.onFlagMemberInfo, callback),
   handleFlagMemberTellStop: () => ipcRenderer.send(IpcKey.handleFlagMemberTellStop),
   exportFlagMember: () => ipcRenderer.send(IpcKey.exportFlagMember),
+  getGroupMemberList: (params: { groupId: string; flagNumber: number; userId: number }) =>
+    ipcRenderer.send(IpcKey.getGroupMemberList, params),
 };
 
 export type IElectronAPI = typeof electronAPI;

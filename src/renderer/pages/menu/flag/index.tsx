@@ -74,6 +74,22 @@ const Flag = () => {
     window.electronAPI.exportFlagMember();
   };
 
+  const onClickGroupMemberFlag = () => {
+    isSuccess()
+      .then(() => {
+        window.electronAPI.getGroupMemberList({
+          groupId: gatherUrl,
+          flagNumber: Number(count),
+          userId: Number(selectedUserList[0]),
+        });
+        setGatherCounts((prev) => ({ ...prev, total: Number(count) }));
+        setGatherStatus(GatherStatus.gather);
+      })
+      .catch((error) => {
+        handleToast(error, 'error');
+      });
+  };
+
   const onhandleStop = () => {
     window.electronAPI.handleFlagMemberTellStop();
     handleToast('正在停止采集,请稍等！', 'success');
@@ -182,7 +198,7 @@ const Flag = () => {
                   <Button color="primary" isLoading={isGather} onClick={onClickGroupTell}>
                     群发言采集
                   </Button>
-                  <Button isDisabled={isGather} color="primary">
+                  <Button isLoading={isGather} color="primary" onClick={onClickGroupMemberFlag}>
                     群成员采集
                   </Button>
                   <Button isDisabled={isGather} color="primary" onClick={exportFlagMember}>

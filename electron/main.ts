@@ -18,7 +18,12 @@ import { pullGroup, handleInviteMemberPause } from './telegramCore/pullModule';
 import { deleteUser, getPageUsers } from './db/module/user.ts';
 import { addRiskDict, getRiskDictList, deleteRiskDict } from './db/module/risk.ts';
 import { registerKeyboard } from './global/keyboard.ts';
-import { handleFlagMemberTell, handleFlagMemberTellStop, exportFlagMember } from './telegramCore/flagModule.ts';
+import {
+  handleFlagMemberTell,
+  handleFlagMemberTellStop,
+  exportFlagMember,
+  getGroupMemberList,
+} from './telegramCore/flagModule.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -69,6 +74,7 @@ function createWindow() {
     [IpcKey.handleFlagMemberTell, handleFlagMemberTell],
     [IpcKey.handleFlagMemberTellStop, handleFlagMemberTellStop],
     [IpcKey.exportFlagMember, exportFlagMember],
+    [IpcKey.getGroupMemberList, getGroupMemberList],
   ]);
 
   const ipcMainHandMap = new Map<IpcKey, (event: IpcMainInvokeEvent, ...args: any[]) => void>([
