@@ -76,7 +76,10 @@ const Head = () => {
     window.electronAPI.onFlagMemberInfo((_event, params) => {
       const { successNumber, type } = params;
       if (type === 'success') setGatherCounts((prev) => ({ ...prev, success: successNumber }));
-      if (type === 'error') handleToast(params.message, 'error');
+      if (type === 'error') {
+        handleToast(params.message, 'error');
+        setGatherStatus(GatherStatus.awaitGather);
+      }
       if (type === 'end') {
         setGatherStatus(GatherStatus.awaitGather);
         setGatherCounts((prev) => ({ ...prev, success: successNumber }));
