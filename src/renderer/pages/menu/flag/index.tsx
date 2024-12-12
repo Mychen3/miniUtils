@@ -1,16 +1,84 @@
 import styles from './css/index.module.scss';
 import { Input, Card, CardBody, Radio, RadioGroup, Tooltip, Button } from '@nextui-org/react';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useStore from '@src/renderer/store';
 import Icons from '@src/renderer/components/Icons';
 import { GatherStatus, GatherTime } from '@src/../common/const/index';
 import ScreenTableModal from '../work/components/ScreenTableModal';
-
+import { isTelegramLink } from '@src/utils/index';
+import { toast, Bounce } from 'react-toastify';
+import { useMount } from 'ahooks';
 const Flag = () => {
-  const { gatherCounts, gatherTime, setGatherTime, setGatherUrl, gatherUrl, gatherStatus } = useStore();
+  const {
+    gatherCounts,
+    gatherTime,
+    setGatherTime,
+    setGatherUrl,
+    gatherUrl,
+    gatherStatus,
+    setGatherStatus,
+    setGatherCounts,
+  } = useStore();
   const [isScreenTableModal, setIsScreenTableModal] = useState(false);
   const [selectedUserList, setSelectedUserList] = useState<string[]>([]);
+  const [count, setCount] = useState('');
+
+  const handleToast = (message: string, type: 'error' | 'success') => {
+    toast(message, {
+      type,
+      position: 'top-right',
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+      transition: Bounce,
+    });
+  };
+
+  const isGather = useMemo(() => gatherStatus === GatherStatus.gather, [gatherStatus]);
+
+  const isSuccess = () =>
+    new Promise((resolve, reject) => {
+      if (!isTelegramLink(gatherUrl)) reject('请输入正确的群链接');
+      if (selectedUserList.length === 0) reject('请选择用户');
+      if (count === '' || count === '0') reject('请输入采集数量');
+      resolve(true);
+    });
+
+  useMount(() => {
+    setCount(gatherCounts.total.toString());
+  });
+
+  const onClickGroupTell = () => {
+    isSuccess()
+      .then(() => {
+        window.electronAPI.handleFlagMemberTell({
+          groupId: gatherUrl,
+          flagNumber: Number(count),
+          flagTime: gatherTime,
+          userId: Number(selectedUserList[0]),
+        });
+        setGatherCounts((prev) => ({ ...prev, total: Number(count) }));
+        setGatherStatus(GatherStatus.gather);
+      })
+      .catch((error) => {
+        handleToast(error, 'error');
+      });
+  };
+
+  const exportFlagMember = () => {
+    window.electronAPI.exportFlagMember();
+  };
+
+  const onhandleStop = () => {
+    window.electronAPI.handleFlagMemberTellStop();
+    handleToast('正在停止采集,请稍等！', 'success');
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.tabsContainer}>
@@ -96,25 +164,32 @@ const Flag = () => {
                     筛选用户
                   </Button>
                   <Input
-                    label="采集数量"
+                    label="需采集数量"
                     labelPlacement="outside"
                     name="email"
                     placeholder="请输入要采集的数量"
                     className="w-[300px]"
                     classNames={{ label: 'text-[16px]', inputWrapper: 'mt-[20px]' }}
                     type="number"
+                    value={count}
+                    onChange={(e) => setCount(e.target.value)}
                   />
                 </div>
 
                 <div
-                  className={`mt-[20px] grid gap-5 pt-[10px] transition-all duration-300 ${gatherStatus === GatherStatus.gather ? 'grid-cols-5' : 'grid-cols-4 '}`}
+                  className={`mt-[20px] grid gap-5 pt-[10px] transition-all duration-300 ${isGather ? 'grid-cols-4' : 'grid-cols-3 '}`}
                 >
-                  <Button color="primary">群发言采集</Button>
-                  <Button color="primary">群成员采集</Button>
-                  <Button color="primary">导出</Button>
-                  <Button color="primary">复制</Button>
-                  {gatherStatus === GatherStatus.gather && (
-                    <Button color="danger" className="mt-[10px]">
+                  <Button color="primary" isLoading={isGather} onClick={onClickGroupTell}>
+                    群发言采集
+                  </Button>
+                  <Button isDisabled={isGather} color="primary">
+                    群成员采集
+                  </Button>
+                  <Button isDisabled={isGather} color="primary" onClick={exportFlagMember}>
+                    导出
+                  </Button>
+                  {isGather && (
+                    <Button color="danger" onClick={onhandleStop}>
                       停止
                     </Button>
                   )}

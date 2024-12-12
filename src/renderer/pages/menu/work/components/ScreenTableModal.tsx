@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
   Button,
+  Input,
   SelectionMode,
 } from '@nextui-org/react';
 import type { Selection } from '@react-types/shared';
@@ -18,6 +19,7 @@ import StatusTag from '@src/renderer/pages/homePage/components/StatusTag';
 import { IUserItem } from 'electron/db/module/user';
 import { useRef, useState } from 'react';
 import { useMemoizedFn, useMount, useUpdateEffect } from 'ahooks';
+import { SearchIcon } from '@nextui-org/shared-icons';
 
 type IScreenTableModalProps = {
   isOpen: boolean;
@@ -40,12 +42,13 @@ const ScreenTableModal = ({
     page: 1,
     pageSize: 15,
   });
+  const [phone, setPhone] = useState('');
   const [total, setTotal] = useState(0);
   const oldSelectedList = useRef<string[]>([]);
 
   const getList = useMemoizedFn(async (params) => {
     setLoading(true);
-    const res = await window.electronAPI.getPageUsers(params);
+    const res = await window.electronAPI.getPageUsers({ ...params, phone });
     setList((prev) => [...prev, ...res.list]);
     setLoading(false);
     setTotal(res.total);
@@ -70,6 +73,12 @@ const ScreenTableModal = ({
     await getList(params.current);
   };
 
+  const onSearch = async () => {
+    params.current.page = 1;
+    setList([]);
+    await getList(params.current);
+  };
+
   useMount(async () => await getList(params.current));
 
   return (
@@ -77,6 +86,19 @@ const ScreenTableModal = ({
       <ModalContent>
         <ModalHeader>筛选账户</ModalHeader>
         <ModalBody>
+          <div className="flex items-center gap-2">
+            <Input
+              isClearable
+              className="w-full w-[44%]"
+              placeholder="请输入手机号，不用+号"
+              startContent={<SearchIcon />}
+              value={phone}
+              onValueChange={(value) => setPhone(value)}
+            />
+            <Button color="primary" onPress={onSearch}>
+              搜索
+            </Button>
+          </div>
           <Table
             color="primary"
             selectedKeys={selectedUserList}
@@ -86,9 +108,9 @@ const ScreenTableModal = ({
             isHeaderSticky
             aria-label="Example static collection table"
             classNames={{
-              base: 'h-[calc(100vh-280px)] scrollbar-y-hidden',
+              base: 'h-[calc(100vh-330px)] scrollbar-y-hidden',
               thead: 'top-[-16px]',
-              wrapper: 'h-[calc(100vh-240px)]',
+              wrapper: 'h-[calc(100vh-330px)]',
             }}
             bottomContent={
               total > list.length ? (

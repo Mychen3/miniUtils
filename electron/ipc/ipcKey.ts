@@ -19,5 +19,8 @@ export enum IpcKey {
   inviteUser = 'inviteUser', // 邀请用户
   onPullHandleMessage = 'onPullHandleMessage', // 监听拉取群组消息
   handleInviteMemberPause = 'onInviteMemberPause', // 设置邀请成员暂停
-  handleFlagMember = 'handleFlagMember', // 设置标记成员
+  handleFlagMemberTell = 'handleFlagMemberTell', // 采集群发言
+  onFlagMemberInfo = 'onFlagMemberInfo', // 采集群发言
+  handleFlagMemberTellStop = 'handleFlagMemberTellStop', // 停止采集群发言
+  exportFlagMember = 'exportFlagMember', // 导出采集群发言
 }

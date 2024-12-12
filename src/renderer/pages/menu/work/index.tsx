@@ -21,6 +21,7 @@ import { useMemoizedFn } from 'ahooks';
 import { toast, Bounce, TypeOptions } from 'react-toastify';
 import useStore from '@src/renderer/store/index';
 import ScreenTableModal from './components/ScreenTableModal';
+import { isTelegramLink } from '@src/utils/index';
 import { motion } from 'framer-motion';
 
 const Work = () => {
@@ -54,11 +55,6 @@ const Work = () => {
       error: 0,
     }));
     clearMsgList();
-  };
-
-  const isTelegramLink = (url: string) => {
-    const prefix = 'https://t.me/';
-    return url.startsWith(prefix);
   };
 
   const onToastMessage = (message: string, type: TypeOptions) => {

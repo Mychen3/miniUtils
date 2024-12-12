@@ -5,7 +5,7 @@ import type { QueueItem } from '../workr/TimedQueue.ts';
 import type { TypeOptions } from 'react-toastify';
 import type { IUserItem } from '../db/module/user';
 import type { RiskDictItem } from '../db/module/risk';
-import type { PullHandleMessage, GatherTime } from '../../common/const';
+import type { PullHandleMessage, GatherTime, FlagMemberInfo } from '../../common/const';
 
 const electronAPI = {
   windowClose: () => ipcRenderer.send(IpcKey.close),
@@ -35,12 +35,16 @@ const electronAPI = {
   onPullHandleMessage: (callback: (event: IpcRendererEvent, params: PullHandleMessage) => void) =>
     ipcRenderer.on(IpcKey.onPullHandleMessage, callback),
   handleInviteMemberPause: (isStop: boolean) => ipcRenderer.send(IpcKey.handleInviteMemberPause, isStop),
-  handleFlagMember: (params: {
+  handleFlagMemberTell: (params: {
     groupId: string;
     flagNumber: number;
     flagTime: keyof typeof GatherTime;
     userId: number;
-  }) => ipcRenderer.send(IpcKey.handleFlagMember, params),
+  }) => ipcRenderer.send(IpcKey.handleFlagMemberTell, params),
+  onFlagMemberInfo: (callback: (event: IpcRendererEvent, params: FlagMemberInfo) => void) =>
+    ipcRenderer.on(IpcKey.onFlagMemberInfo, callback),
+  handleFlagMemberTellStop: () => ipcRenderer.send(IpcKey.handleFlagMemberTellStop),
+  exportFlagMember: () => ipcRenderer.send(IpcKey.exportFlagMember),
 };
 
 export type IElectronAPI = typeof electronAPI;

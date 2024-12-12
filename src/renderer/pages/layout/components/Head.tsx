@@ -4,10 +4,11 @@ import { useState, useMemo } from 'react';
 import type { IconSetType } from '@const/iconSet.ts';
 import { useCreation, useMemoizedFn } from 'ahooks';
 import { systemKey } from '@const/publicConst.ts';
-import { ToastContainer, toast, Bounce } from 'react-toastify';
+import { ToastContainer, toast, Bounce, TypeOptions } from 'react-toastify';
 import { useMount } from 'ahooks';
 import useStore from '@src/renderer/store/index';
-import { applayUserStatus } from '@src/../common/const/index';
+import { applayUserStatus, GatherStatus } from '@src/../common/const/index';
+
 import 'react-toastify/dist/ReactToastify.css';
 
 type IConsItem = {
@@ -19,7 +20,7 @@ type IConsItem = {
 const Head = () => {
   const [isMax, setIsMax] = useState(false);
   const [onTop, setOnTop] = useState(false);
-  const { addMsgList, setUserCount, setServeStatus } = useStore();
+  const { addMsgList, setUserCount, setServeStatus, setGatherCounts, setGatherStatus } = useStore();
   const isMac = useCreation(() => {
     // 实验性特性 https://developer.mozilla.org/zh-CN/docs/Web/API/NavigatorUAData
     /* @ts-ignore */
@@ -71,6 +72,19 @@ const Head = () => {
     });
   });
 
+  const initOnFlagMemberInfo = useMemoizedFn(() => {
+    window.electronAPI.onFlagMemberInfo((_event, params) => {
+      const { successNumber, type } = params;
+      if (type === 'success') setGatherCounts((prev) => ({ ...prev, success: successNumber }));
+      if (type === 'error') handleToast(params.message, 'error');
+      if (type === 'end') {
+        setGatherStatus(GatherStatus.awaitGather);
+        setGatherCounts((prev) => ({ ...prev, success: successNumber }));
+        handleToast('采集完成', 'success');
+      }
+    });
+  });
+
   const onClickIcon = useMemoizedFn((target: IConsItem) => {
     const actionMap: Record<string, () => void> = {
       close: () => window.electronAPI.windowHide(),
@@ -87,26 +101,31 @@ const Head = () => {
     actionMap[target.name]?.();
   });
 
+  const handleToast = useMemoizedFn((message: string, type: TypeOptions) => {
+    toast(message, {
+      type,
+      position: 'top-right',
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+      transition: Bounce,
+    });
+  });
+
   const onToastMessage = useMemoizedFn(() => {
     window.electronAPI.onToastMessage((_event, message, type) => {
-      toast(message, {
-        type,
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-        transition: Bounce,
-      });
+      handleToast(message, type);
     });
   });
 
   useMount(() => {
     onToastMessage();
     onPullHandleMessage();
+    initOnFlagMemberInfo();
   });
 
   return (

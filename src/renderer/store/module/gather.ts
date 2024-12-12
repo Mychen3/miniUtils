@@ -7,7 +7,7 @@ type IUpdateGatherCounts = (prevGatherCounts: { total: number; success: number }
 };
 
 export interface IGather {
-  gatherStatus: GatherStatus ;
+  gatherStatus: GatherStatus;
   gatherCounts: {
     total: number;
     success: number;

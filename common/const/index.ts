@@ -66,6 +66,12 @@ export type PullHandleMessage = {
   message: string;
 };
 
+export type FlagMemberInfo = {
+  successNumber: number;
+  type: PullHandleMessage['type'];
+  message: PullHandleMessage['message'];
+};
+
 const TgErrorConst: Record<IErrorType, string> = {
   [IErrorType.PHONE_CODE_INVALI]: '验证码不正确，重新输入',
   [IErrorType.CHECK_USER_RISK]: '当前账号无法判断是否存在风险，请添加词典！',
