@@ -9,14 +9,14 @@ import fs from 'fs';
 let speakerIdList: Array<string> = [];
 let isStop = false;
 
-const getHours = (flagTime: GatherTime) => {
-  const hours = {
-    [GatherTime.day]: 24,
-    [GatherTime.threeDay]: 72,
-    [GatherTime.monday]: 168,
-  }[flagTime];
-  return hours;
-};
+// const getHours = (flagTime: GatherTime) => {
+//   const hours = {
+//     [GatherTime.day]: 24,
+//     [GatherTime.threeDay]: 72,
+//     [GatherTime.monday]: 168,
+//   }[flagTime];
+//   return hours;
+// };
 
 const handleFlagMemberTellStop = () => {
   isStop = true;
