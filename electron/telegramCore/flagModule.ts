@@ -85,9 +85,9 @@ const handleFlagMemberTell = async (
   speakerIdList = [];
   let clientGlobal: TelegramClient | null = null;
   try {
-    const { groupId, flagNumber, flagTime, userId } = params;
-    const now = new Date();
-    const timeAgo = new Date(now.getTime() - getHours(flagTime) * 60 * 60 * 1000);
+    const { groupId, flagNumber, userId } = params;
+    // const now = new Date();
+    // const timeAgo = new Date(now.getTime() - getHours(flagTime) * 60 * 60 * 1000);
     const result = await getFlagTellInfo(userId, groupId)!;
     if (!result) throw new Error('获取群组信息失败');
     const { client, adminList, groupEntity } = result;
@@ -95,7 +95,7 @@ const handleFlagMemberTell = async (
     clientGlobal = client;
     const speakerIds = new Set();
     let offset = 0;
-    const limit = 200;
+    const limit = 100;
     let reachedTimeLimit = false;
 
     while (speakerIds.size < flagNumber && !reachedTimeLimit) {
@@ -109,11 +109,11 @@ const handleFlagMemberTell = async (
       if (messages.length === 0) break;
 
       for (const message of messages) {
-        // 如果消息时间超出范围，标记时间限制并退出循环
-        if (message.date < Math.floor(timeAgo.getTime() / 1000)) {
-          reachedTimeLimit = true;
-          break;
-        }
+        // // 如果消息时间超出范围，标记时间限制并退出循环
+        // if (message.date < Math.floor(timeAgo.getTime() / 1000)) {
+        //   reachedTimeLimit = true;
+        //   break;
+        // }
         // 获取实际发言的用户ID，并确保转换为字符串
         const userName = (message?.sender as { username: string })?.username;
         if (userName && !adminList.includes(userName)) speakerIds.add(`@${userName}`);
