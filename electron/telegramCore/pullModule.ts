@@ -14,6 +14,7 @@ const pullInfo = {
   groupHash: '',
   pullStatus: applayUserStatus.pullWait,
   currentWin: null as BrowserWindow | null,
+  inviteTime: 10,
 };
 
 const handleSetUserIndex = () => {
@@ -28,6 +29,7 @@ const clearPullInfo = () => {
   pullInfo.pullStatus = applayUserStatus.pullWait;
   pullInfo.currentWin = null;
   pullInfo.groupHash = '';
+  pullInfo.inviteTime = 10;
 };
 
 const nextPull = () => {
@@ -65,8 +67,11 @@ const startPull = async () => {
   const currentUser = pullInfo.currentUser[pullInfo.currentUserIndex];
 
   try {
-    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, { type: 'info', message: '10秒后开始拉取！' });
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
+      type: 'info',
+      message: `${pullInfo.inviteTime}秒后开始拉取`,
+    });
+    await new Promise((resolve) => setTimeout(resolve, pullInfo.inviteTime));
 
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'info',
@@ -135,7 +140,7 @@ const handleInviteMemberPause = (_event: IpcMainEvent, isStop: boolean) => {
 
 const pullGroup = async (
   _event: IpcMainInvokeEvent,
-  params: { pullNames: string; groupId: string; userIds: string },
+  params: { pullNames: string; groupId: string; userIds: string; inviteTime: number },
 ) => {
   pullInfo.currentWin = BrowserWindow.fromWebContents(_event.sender);
   return new Promise(async (resolve, reject) => {
@@ -146,6 +151,7 @@ const pullGroup = async (
       pullInfo.currentUser = userList as IUserItem[];
       pullInfo.currentPullNames = params.pullNames.split(',');
       pullInfo.groupHash = params.groupId.split('/').pop() as string;
+      pullInfo.inviteTime = params.inviteTime;
       // 开始拉取
       pullInfo.pullStatus = applayUserStatus.pull;
     }

@@ -38,6 +38,7 @@ const Work = () => {
   const [isStopLoading, setIsStopLoading] = useState(false);
   const [isScreenTableModal, setIsScreenTableModal] = useState(false);
   const [selectedUserList, setSelectedUserList] = useState<string[]>([]);
+  const [inviteTime, setInviteTime] = useState(10);
   const sliderValue = useMemo(
     () => (userCount.total === 0 ? 0 : (userCount.success / userCount.total) * 100),
     [userCount],
@@ -83,6 +84,7 @@ const Work = () => {
           pullNames: useListRef.current.join(','),
           groupId: groupUrl,
           userIds: selectedUserList.join(','),
+          inviteTime,
         });
         setServeStatus(applayUserStatus.pull);
         setIsGroupModal(false);
@@ -205,6 +207,18 @@ const Work = () => {
               value={groupUrl}
               onChange={(e) => setGroupUrl(e.target.value)}
               placeholder="请输入群地址"
+            />
+            <Slider
+              value={inviteTime}
+              onChange={(v) => setInviteTime(v as number)}
+              defaultValue={10}
+              label="邀请频率（秒）"
+              maxValue={30}
+              minValue={10}
+              step={1}
+              classNames={{
+                filler: 'bg-gradient-to-r from-[#006FEE] to-[#A300FF] ',
+              }}
             />
           </ModalBody>
           <ModalFooter>
