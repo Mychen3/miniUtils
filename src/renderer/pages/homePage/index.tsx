@@ -29,7 +29,6 @@ type IParams = {
 };
 
 const HomePage = () => {
-  const [nameSearch, setNameSearch] = useState('');
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [params, setParams] = useState({
@@ -41,6 +40,7 @@ const HomePage = () => {
   const [total, setTotal] = useState(1);
 
   const getList = useMemoizedFn(async (params: IParams) => {
+    setLoading(true);
     const res = await window.electronAPI.getPageUsers(params);
     setList(res.list);
     setTotal(res.total);
@@ -64,6 +64,11 @@ const HomePage = () => {
     getList(pageParams);
   };
 
+  const onSearch = () => {
+    setParams({ ...params, page: 1 });
+    getList(params);
+  };
+
   useMount(async () => {
     await getList(params);
   });
@@ -82,12 +87,12 @@ const HomePage = () => {
               placeholder="搜索账号"
               size="sm"
               startContent={<SearchIcon className="text-default-300" />}
-              value={nameSearch}
+              value={params.phone}
               variant="bordered"
-              onClear={() => setNameSearch('')}
-              onChange={(e) => setNameSearch(e.target.value)}
+              onClear={() => setParams({ ...params, phone: '' })}
+              onChange={(e) => setParams({ ...params, phone: e.target.value })}
             />
-            <Button size="sm" color="primary">
+            <Button size="sm" color="primary" onClick={onSearch}>
               搜索
             </Button>
             <Button size="sm" color="primary" onClick={onOpen} endContent={<Icons name="add" />}>
