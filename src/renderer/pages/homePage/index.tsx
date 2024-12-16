@@ -84,7 +84,7 @@ const HomePage = () => {
                 base: 'w-[200px]',
                 inputWrapper: 'border-1',
               }}
-              placeholder="搜索账号"
+              placeholder="手机号搜索"
               size="sm"
               startContent={<SearchIcon className="text-default-300" />}
               value={params.phone}
