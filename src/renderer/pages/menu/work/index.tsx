@@ -213,7 +213,7 @@ const Work = () => {
               onChange={(v) => setInviteTime(v as number)}
               defaultValue={10}
               label="邀请频率（秒）"
-              maxValue={30}
+              maxValue={60}
               minValue={10}
               step={1}
               classNames={{

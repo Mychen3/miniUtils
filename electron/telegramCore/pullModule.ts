@@ -71,7 +71,8 @@ const startPull = async () => {
       type: 'info',
       message: `${pullInfo.inviteTime}秒后开始拉取`,
     });
-    await new Promise((resolve) => setTimeout(resolve, pullInfo.inviteTime));
+    console.log(pullInfo.inviteTime);
+    await new Promise((resolve) => setTimeout(resolve, pullInfo.inviteTime * 1000));
 
     pullInfo.currentWin?.webContents.send(IpcKey.onPullHandleMessage, {
       type: 'info',
