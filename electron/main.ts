@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { IpcKey } from './ipc/ipcKey.ts';
@@ -9,6 +9,7 @@ import {
   windowHide,
   windowMinimize,
   addTimedQueue,
+  searchApp,
 } from './ipc/mainIpc.ts';
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
@@ -58,11 +59,36 @@ function createWindow() {
     [IpcKey.setWindowPin, setWindowPin],
     [IpcKey.addTimedQueue, addTimedQueue],
   ]);
+
+  const ipcMainHandMap = new Map<IpcKey, (event: IpcMainInvokeEvent, ...args: any[]) => void>([
+    [IpcKey.searchApp, searchApp],
+  ]);
+
   ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
+  ipcMainHandMap.forEach((value, key) => ipcMain.handle(key, value));
 
   win.on('closed', () => {
     ipcMainMap.forEach((_value, key) => ipcMain.removeAllListeners(key));
+    ipcMainHandMap.forEach((_value, key) => ipcMain.removeHandler(key));
   });
+
+  // win.webContents.setWindowOpenHandler(({ url }) => {
+  //   console.log(url);
+  //   return {
+  //     action: 'allow',
+  //     overrideBrowserWindowOptions: {
+  //       frame: false, // 移除窗口边框
+  //       titleBarStyle: 'hidden',
+  //       autoHideMenuBar: true,
+  //       width: 800,
+  //       height: 600,
+  //       webPreferences: {
+  //         nodeIntegration: false,
+  //         contextIsolation: true,
+  //       },
+  //     },
+  //   };
+  // });
 }
 
 app.on('window-all-closed', () => {

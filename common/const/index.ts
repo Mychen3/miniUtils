@@ -4,4 +4,8 @@ enum systemKey {
   linux = 'linux',
 }
 
-export { systemKey };
+enum windowOpenType {
+  searchWindow = 'searchWindow',
+}
+
+export { systemKey, windowOpenType };

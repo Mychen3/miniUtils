@@ -6,4 +6,5 @@ export enum IpcKey {
   setWindowPin = 'setWindowPin', // 窗口置顶
   addTimedQueue = 'addTimedQueue', // 添加定时任务
   onTimedQueueTask = 'onTimedQueueTask', // 定时任务
+  searchApp = 'searchApp', // 搜索App
 }

@@ -11,6 +11,7 @@ const electronAPI = {
   addTimedQueue: (target: Omit<QueueItem, 'callback'>) => ipcRenderer.send(IpcKey.addTimedQueue, target),
   onTimedQueueTask: (callback: (event: IpcRendererEvent, taskName: string) => void) =>
     ipcRenderer.on(IpcKey.onTimedQueueTask, callback),
+  searchApp: (keyword: string) => ipcRenderer.invoke(IpcKey.searchApp, keyword),
 };
 
 export type IElectronAPI = typeof electronAPI;

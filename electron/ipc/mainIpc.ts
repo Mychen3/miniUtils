@@ -1,4 +1,4 @@
-import { BrowserWindow, IpcMainEvent } from 'electron';
+import { BrowserWindow, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import TimedQueue, { QueueItem } from '../workr/TimedQueue.ts';
 import { IpcKey } from './ipcKey.ts';
 
@@ -39,4 +39,9 @@ export const addTimedQueue = (event: IpcMainEvent, target: Omit<QueueItem, 'call
       },
     });
   }
+};
+
+// 搜索App
+export const searchApp = (_event: IpcMainInvokeEvent, keyword: string) => {
+  console.log(keyword);
 };

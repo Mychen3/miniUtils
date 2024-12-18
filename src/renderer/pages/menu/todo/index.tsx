@@ -1,7 +1,8 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import styles from './css/index.module.scss';
-import { Button } from '@nextui-org/react';
+import { Button, Input } from '@nextui-org/react';
 import { useMount } from 'ahooks';
+
 const Todo = () => {
   const count = useRef(0);
   const onClick = (time: number) => {
@@ -12,6 +13,14 @@ const Todo = () => {
     });
   };
 
+  const [searchApp, setSearchApp] = useState<string>('');
+
+  const onClickSearch = async (value: string) => {
+    setSearchApp(value);
+    const result = await window.electronAPI.searchApp(value);
+    console.log(result);
+  };
+
   useMount(() => {
     window.electronAPI.onTimedQueueTask((_, taskName: string) => {
       console.log(taskName);
@@ -20,7 +29,7 @@ const Todo = () => {
 
   return (
     <div className={styles.todoConent}>
-      <Button onClick={() => onClick(10000)}>定时10秒</Button>
+      <Input placeholder="请输入搜索关键字" value={searchApp} onChange={(e) => onClickSearch(e.target.value)} />
       <Button onClick={() => onClick(5000)}>定时5秒</Button>
     </div>
   );
