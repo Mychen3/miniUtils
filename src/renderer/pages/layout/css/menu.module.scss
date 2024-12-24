@@ -2,7 +2,7 @@
   box-sizing: border-box;
   width: 100%;
   height: calc(100vh - var(--head-height) - 120px);
-  padding: 12px 10px;
+  padding: 12px 8px;
   overflow-y: auto;
   user-select: none;
   position: relative;
@@ -21,7 +21,6 @@
   svg {
     position: relative;
     z-index: 2;
-    margin-right: 6px;
   }
   span {
     position: relative;
@@ -36,12 +35,12 @@
 }
 
 .activeMenu {
-  width: 79px;
+  width: 44px;
   border-radius: 8px;
   height: 40px;
   position: absolute;
   top: 12px;
-  left: 10px;
+  left: 8px;
   z-index: 1;
   transition: transform 0.3s ease;
   background-color: hsl(var(--theme-primary-500)) !important;

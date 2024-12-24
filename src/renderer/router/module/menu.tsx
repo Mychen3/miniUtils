@@ -19,7 +19,7 @@ const routes: IMenuTypeItem[] = [
     meta: {
       title: '盒子',
       icon: 'home',
-      className: 'w-[22px] h-[22px]',
+      className: 'w-[26px] h-[26px]',
     },
   },
   {
@@ -28,6 +28,7 @@ const routes: IMenuTypeItem[] = [
     meta: {
       title: '待办',
       icon: 'todo',
+      className: 'w-[24px] h-[24px]',
     },
   },
 ];
