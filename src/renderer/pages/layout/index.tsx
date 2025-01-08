@@ -10,7 +10,7 @@ const Layout = () => (
     <div className="h-[calc(100vh-var(--head-height))] box-border flex">
       <div className={styles.menu}>
         <div className={styles.logo}>
-          <Icons name="logo" className="w-[40px] h-[40px]"></Icons>
+          <Icons name="logo" className="w-[45px] h-[45px]"></Icons>
         </div>
         <Menu></Menu>
       </div>

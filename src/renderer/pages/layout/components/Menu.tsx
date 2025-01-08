@@ -21,7 +21,7 @@ const Menu = () => {
     <div className={styles.menu}>
       <div className={styles.activeMenu} style={{ transform: `translateY(${activeIndex.current * 46}px)` }}></div>
       {menuRoutes.map((item, index) => (
-        <Tooltip color="primary" content={item.meta.title} delay={1000} placement="right">
+        <Tooltip color="primary" content={item.meta.title} delay={1000} placement="right" key={item.path}>
           <div
             key={item.path}
             className={`${styles.menuItem} ${activeMenu === item.path ? styles.activeMenuStyle : ''}`}
