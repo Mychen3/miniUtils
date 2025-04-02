@@ -34,6 +34,7 @@ const Work = () => {
   const { msgList, userCount, serveStatus, setUserCount, setServeStatus, clearMsgList } = useStore();
   const useListRef = useRef<string[]>([]);
   const [isGroupModal, setIsGroupModal] = useState(false);
+  const [isExitGroupModal, setIsExitGroupModal] = useState(false);
   const [groupUrl, setGroupUrl] = useState('');
   const [isStopLoading, setIsStopLoading] = useState(false);
   const [isScreenTableModal, setIsScreenTableModal] = useState(false);
@@ -110,6 +111,16 @@ const Work = () => {
     }, 10000);
   };
 
+  const onBatchExitGroup = () => {
+    if (selectedUserList.length === 0) return onToastMessage('请先选择账户', 'error');
+    if (!isTelegramLink(groupUrl)) return onToastMessage('请输入正确的群组链接', 'error');
+    window.electronAPI.batchExitGroup({
+      groupUrl,
+      userIds: selectedUserList.join(','),
+    });
+    onToastMessage('正在批量退出群组，请稍后查看...', 'success');
+  };
+
   const getMsgColor = useMemoizedFn((type: string) => {
     if (type === 'info') return 'text-default-600';
     if (type === 'success') return 'text-success';
@@ -118,6 +129,12 @@ const Work = () => {
     if (type === 'stop') return 'text-yellow-500';
     return '';
   });
+
+  const onCloseExitGroupModal = () => {
+    setIsExitGroupModal(false);
+    setGroupUrl('');
+  };
+
   const isInvite = [applayUserStatus.pull, applayUserStatus.pullPause].includes(serveStatus as applayUserStatus);
   return (
     <div className={styles.container}>
@@ -138,6 +155,14 @@ const Work = () => {
             onClick={() => setIsScreenTableModal(true)}
           >
             筛选用户
+          </Button>
+          <Button
+            color="primary"
+            size="sm"
+            endContent={<Icons name="exitRun" />}
+            onClick={() => setIsExitGroupModal(true)}
+          >
+            批量退组
           </Button>
           <Button
             isLoading={isInvite}
@@ -226,6 +251,27 @@ const Work = () => {
               取消
             </Button>
             <Button color="primary" onPress={onStartInvite}>
+              开始执行
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isExitGroupModal} size="xl" isDismissable={false} onClose={onCloseExitGroupModal}>
+        <ModalContent>
+          <ModalHeader>批量退组</ModalHeader>
+          <ModalBody>
+            <Input
+              label="群组链接"
+              value={groupUrl}
+              onChange={(e) => setGroupUrl(e.target.value)}
+              placeholder="请输入需要退出的群组链接"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" variant="flat" onPress={onCloseExitGroupModal}>
+              取消
+            </Button>
+            <Button color="primary" onPress={onBatchExitGroup}>
               开始执行
             </Button>
           </ModalFooter>

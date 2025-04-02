@@ -14,7 +14,7 @@ import {
 import { systemKey } from '../common/const';
 import { createTray, destroyTray } from './tray';
 import { handleLogin, refreshUserStatus } from './telegramCore';
-import { pullGroup, handleInviteMemberPause } from './telegramCore/pullModule';
+import { pullGroup, handleInviteMemberPause, batchExitGroup } from './telegramCore/pullModule';
 import { deleteUser, getPageUsers } from './db/module/user.ts';
 import { addRiskDict, getRiskDictList, deleteRiskDict } from './db/module/risk.ts';
 import { registerKeyboard } from './global/keyboard.ts';
@@ -75,6 +75,7 @@ function createWindow() {
     [IpcKey.handleFlagMemberTellStop, handleFlagMemberTellStop],
     [IpcKey.exportFlagMember, exportFlagMember],
     [IpcKey.getGroupMemberList, getGroupMemberList],
+    [IpcKey.batchExitGroup, batchExitGroup],
   ]);
 
   const ipcMainHandMap = new Map<IpcKey, (event: IpcMainInvokeEvent, ...args: any[]) => void>([
@@ -95,9 +96,10 @@ function createWindow() {
   });
 }
 
-const isSingleInstance = app.requestSingleInstanceLock();
+// 单例模式 (暂时允许多开)
+// const isSingleInstance = app.requestSingleInstanceLock();
 
-if (!isSingleInstance) app.quit();
+// if (!isSingleInstance) app.quit();
 
 app.on('second-instance', (_, _commandLine, _workingDirectory) => {
   if (win) {

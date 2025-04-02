@@ -24,4 +24,5 @@ export enum IpcKey {
   handleFlagMemberTellStop = 'handleFlagMemberTellStop', // 停止采集群发言
   exportFlagMember = 'exportFlagMember', // 导出采集群发言
   getGroupMemberList = 'getGroupMemberList', // 获取群成员列表
+  batchExitGroup = 'batchExitGroup', // 批量退出群
 }
