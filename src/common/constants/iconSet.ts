@@ -29,6 +29,7 @@ const IconSet = {
   questionMarkCircle: lazy(() => import('~icons/mdi/question-mark-circle')),
   flagVariantPlusOutline: lazy(() => import('~icons/mdi/flag-variant-plus-outline')),
   exitRun: lazy(() => import('~icons/mdi/exit-run')),
+  settings: lazy(() => import('~icons/mdi/settings-outline')),
 };
 
 type IconSetType = keyof typeof IconSet;

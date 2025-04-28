@@ -5,6 +5,7 @@ import type { IconSetType } from '@src/common/constants/iconSet';
 const Work = lazy(() => import('@pages/menu/work'));
 const Flag = lazy(() => import('@pages/menu/flag'));
 const RiskDict = lazy(() => import('@pages/menu/riskDict'));
+const Setting = lazy(() => import('@pages/menu/setting'));
 
 export type IMenuTypeItem = {
   path: string;
@@ -48,6 +49,14 @@ const routes: IMenuTypeItem[] = [
     meta: {
       title: '采集',
       icon: 'flagVariantPlusOutline',
+    },
+  },
+  {
+    path: 'setting',
+    element: <Setting />,
+    meta: {
+      title: '设置',
+      icon: 'settings',
     },
   },
 ];

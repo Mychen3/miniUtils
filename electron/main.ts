@@ -11,7 +11,7 @@ import {
   windowMinimize,
   addTimedQueue,
 } from './ipc/mainIpc.ts';
-import { systemKey } from '../common/const';
+import { systemKey, authConfig } from '../common/const';
 import { createTray, destroyTray } from './tray';
 import { handleLogin, refreshUserStatus } from './telegramCore';
 import { pullGroup, handleInviteMemberPause, batchExitGroup } from './telegramCore/pullModule';
@@ -24,6 +24,8 @@ import {
   exportFlagMember,
   getGroupMemberList,
 } from './telegramCore/flagModule.ts';
+import { machineIdSync } from 'node-machine-id';
+import axios from 'axios';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -134,9 +136,19 @@ app.on('activate', () => {
   }
 });
 
-app.whenReady().then(() => {
-  createTray(path.join(process.env.VITE_PUBLIC, 'logo.png'));
-  createWindow();
-  initDb(path.join(app.getPath('userData'), 'database.db'));
-  if (app.isPackaged) registerKeyboard();
+app.whenReady().then(async () => {
+  try {
+    const id = machineIdSync(true);
+    const url = `${authConfig.url}/software/createSoftwareMachine`;
+    await axios.post(url, {
+      machineId: id,
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    createTray(path.join(process.env.VITE_PUBLIC, 'logo.png'));
+    createWindow();
+    initDb(path.join(app.getPath('userData'), 'database.db'));
+    if (app.isPackaged) registerKeyboard();
+  }
 });

@@ -225,7 +225,7 @@ const Work = () => {
       />
       <Modal isOpen={isGroupModal} size="xl" isDismissable={false} onClose={() => setIsGroupModal(false)}>
         <ModalContent>
-          <ModalHeader>导入账户（感谢邱老板的KFC，拐哥的奶茶）</ModalHeader>
+          <ModalHeader>导入账户</ModalHeader>
           <ModalBody>
             <Input
               label="群组链接"

@@ -93,6 +93,10 @@ const TgErrorConst: Record<IErrorType, string> = {
   [IErrorType.YOU_BLOCKED_USER]: '您已将该用户（或机器人）拉黑',
 };
 
+const authConfig = {
+  url: 'http://localhost:8443',
+};
+
 export {
   systemKey,
   TgErrorConst,
@@ -105,4 +109,5 @@ export {
   GatherTime,
   apiId,
   apiHash,
+  authConfig,
 };
