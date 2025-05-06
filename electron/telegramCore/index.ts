@@ -1,11 +1,13 @@
 import { BrowserWindow, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import { TelegramClient, sessions, Api } from 'telegram';
 import { IpcKey } from '../ipc/ipcKey';
-import { passKey, tgLoginHandle, IErrorType, apiId, apiHash } from '../../common/const';
+import { passKey, tgLoginHandle, IErrorType } from '../../common/const';
 import { getUserById, insertUser, updateUserStatus } from '../db/module/user';
 import { getErrorMessage } from '../../common/util';
 import { getRiskDictList } from '../db/module/risk';
-
+import { machineIdSync } from 'node-machine-id';
+import { authConfig } from '../../common/const/index';
+import axios from 'axios';
 const saveUser = async (key: string, user: Api.User, status: keyof typeof passKey) => {
   await insertUser({
     userName: user.firstName ?? '',
@@ -16,8 +18,29 @@ const saveUser = async (key: string, user: Api.User, status: keyof typeof passKe
   });
 };
 
+const apiInfo = {
+  apiId: 0,
+  apiHash: '',
+  isLoad: false,
+};
+
+const loadApiInfo = async () => {
+  const id = machineIdSync(true);
+  const url = `${authConfig.url}/software/getTgDeveloperApiId`;
+  const res = await axios.post(url, {
+    machineId: id,
+  });
+  if (res.data.status === 200) {
+    apiInfo.apiId = Number(res.data.data.apiId);
+    apiInfo.apiHash = res.data.data.apiHash;
+    apiInfo.isLoad = true;
+  }
+};
+
 const initClient = async (session: string) => {
-  const client = new TelegramClient(new sessions.StringSession(session), apiId, apiHash, {
+  if (apiInfo.apiId === 0) await loadApiInfo();
+  if (!apiInfo.isLoad) return null;
+  const client = new TelegramClient(new sessions.StringSession(session), apiInfo.apiId, apiInfo.apiHash, {
     connectionRetries: 5,
   });
   try {
@@ -117,4 +140,10 @@ const handleLogin = async (_event: IpcMainEvent, params: { username: string; pas
   }
 };
 
-export { handleLogin, refreshUserStatus, initClient, checkUserRisk };
+// 获取机器ID
+const getMachineId = async () => {
+  const id = machineIdSync(true);
+  return id;
+};
+
+export { handleLogin, refreshUserStatus, initClient, checkUserRisk, getMachineId };

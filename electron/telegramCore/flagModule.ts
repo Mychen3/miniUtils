@@ -88,7 +88,7 @@ const handleFlagMemberTell = async (
     const { groupId, flagNumber, userId } = params;
     // const now = new Date();
     // const timeAgo = new Date(now.getTime() - getHours(flagTime) * 60 * 60 * 1000);
-    const result = await getFlagTellInfo(userId, groupId)!;
+    const result = await getFlagTellInfo(userId, groupId);
     if (!result) throw new Error('获取群组信息失败');
     const { client, adminList, groupEntity } = result;
     if (!client || !groupEntity) throw new Error('客户端或群组实体不存在');

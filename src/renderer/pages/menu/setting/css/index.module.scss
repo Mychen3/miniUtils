@@ -21,7 +21,28 @@
   width: 500px;
 }
 
-.subBtn{
+.subBtn {
   margin-top: 30px;
+}
 
+.loadingContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: hsl(var(--theme-content5));
+}
+
+.autoContainer {
+  box-sizing: border-box;
+  padding: 15px;
+  height: 100%;
+  background-color: hsl(var(--theme-content5));
+}
+.autoContent {
+  box-sizing: border-box;
+  border-radius: 10px;
+  height: 100%;
+  padding: 20px;
 }

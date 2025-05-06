@@ -48,6 +48,7 @@ const electronAPI = {
   getGroupMemberList: (params: { groupId: string; flagNumber: number; userId: number }) =>
     ipcRenderer.send(IpcKey.getGroupMemberList, params),
   batchExitGroup: (params: { groupUrl: string; userIds: string }) => ipcRenderer.send(IpcKey.batchExitGroup, params),
+  getMachineId: () => ipcRenderer.invoke(IpcKey.getMachineId),
 };
 
 export type IElectronAPI = typeof electronAPI;

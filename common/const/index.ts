@@ -37,9 +37,6 @@ const regex = {
   isUserExist: /^No user has "([^"]+)" as username$/,
 };
 
-const apiId = Number(import.meta.env.VITE_TG_API_ID);
-const apiHash = import.meta.env.VITE_TG_API_HASH;
-
 enum IErrorType {
   PHONE_CODE_INVALI = 'PHONE_CODE_INVALI',
   CHECK_USER_RISK = 'CHECK_USER_RISK',
@@ -94,7 +91,7 @@ const TgErrorConst: Record<IErrorType, string> = {
 };
 
 const authConfig = {
-  url: 'http://localhost:8443',
+  url: import.meta.env.VITE_BASE_URL,
 };
 
 export {
@@ -107,7 +104,5 @@ export {
   regex,
   GatherStatus,
   GatherTime,
-  apiId,
-  apiHash,
   authConfig,
 };

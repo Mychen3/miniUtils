@@ -13,7 +13,7 @@ import {
 } from './ipc/mainIpc.ts';
 import { systemKey, authConfig } from '../common/const';
 import { createTray, destroyTray } from './tray';
-import { handleLogin, refreshUserStatus } from './telegramCore';
+import { handleLogin, refreshUserStatus, getMachineId } from './telegramCore';
 import { pullGroup, handleInviteMemberPause, batchExitGroup } from './telegramCore/pullModule';
 import { deleteUser, getPageUsers } from './db/module/user.ts';
 import { addRiskDict, getRiskDictList, deleteRiskDict } from './db/module/risk.ts';
@@ -55,6 +55,9 @@ function createWindow() {
     },
     show: false,
   });
+
+  // Set CSP headers to allow connections to auth server
+
   win.on('ready-to-show', () => {
     win?.show(); // 初始化后再显示
     // timedQueue = new TimedQueue(3000);
@@ -88,6 +91,7 @@ function createWindow() {
     [IpcKey.getRiskDictList, getRiskDictList],
     [IpcKey.deleteRiskDict, deleteRiskDict],
     [IpcKey.inviteUser, pullGroup],
+    [IpcKey.getMachineId, getMachineId],
   ]);
   ipcMainMap.forEach((value, key) => ipcMain.on(key, value));
   ipcMainHandMap.forEach((value, key) => ipcMain.handle(key, value));

@@ -25,4 +25,5 @@ export enum IpcKey {
   exportFlagMember = 'exportFlagMember', // 导出采集群发言
   getGroupMemberList = 'getGroupMemberList', // 获取群成员列表
   batchExitGroup = 'batchExitGroup', // 批量退出群
+  getMachineId = 'getMachineId', // 获取机器ID
 }
