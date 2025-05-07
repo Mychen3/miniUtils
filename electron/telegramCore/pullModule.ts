@@ -186,8 +186,8 @@ const formatError = (error: unknown) => {
 // 批量退出群
 const batchExitGroup = async (_event: IpcMainInvokeEvent, params: { groupUrl: string; userIds: string }) => {
   console.log(params);
-  const { groupUrl, userIds } = params;
-  const userList = await getUsersByIds(userIds.split(',').map(Number), passKey.pass);
+  // const { groupUrl, userIds } = params;
+  // const userList = await getUsersByIds(userIds.split(',').map(Number), passKey.pass);
   // const client = await initClient('');
   try {
     // await client?.invoke(new Api.channels.LeaveChannel({ channel: params.groupUrl }));

@@ -26,4 +26,6 @@ export enum IpcKey {
   getGroupMemberList = 'getGroupMemberList', // 获取群成员列表
   batchExitGroup = 'batchExitGroup', // 批量退出群
   getMachineId = 'getMachineId', // 获取机器ID
+  buySoftware = 'buySoftware', // 购买
+  enterMain = 'enterMain', // 进入主界面
 }

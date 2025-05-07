@@ -146,4 +146,15 @@ const getMachineId = async () => {
   return id;
 };
 
-export { handleLogin, refreshUserStatus, initClient, checkUserRisk, getMachineId };
+// 进入主界面条件
+const enterMain = async () => {
+  const id = await getMachineId();
+  const url = `${authConfig.url}/software/getSoftwareLicenseStatus`;
+  const res = await axios.post(url, {
+    machineId: id,
+  });
+  if (res.data.status !== 200) return false;
+  return res.data.data.isAuto;
+};
+
+export { handleLogin, refreshUserStatus, initClient, checkUserRisk, getMachineId, enterMain };

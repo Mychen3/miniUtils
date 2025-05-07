@@ -1,5 +1,6 @@
 import Layout from '@pages/layout';
 import menuRoutes from './module/menu';
+import Activate from '../pages/activate';
 
 const routes = [
   {
@@ -9,6 +10,13 @@ const routes = [
       title: '布局栏',
     },
     children: menuRoutes,
+  },
+  {
+    path: 'activate',
+    element: <Activate />,
+    meta: {
+      title: '激活',
+    },
   },
 ];
 
